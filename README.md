@@ -87,6 +87,12 @@
 
 ---
 
+## 致谢
+
+本项目修改自 [zebrazjx/ai-native-resume](https://github.com/zebrazjx/ai-native-resume)，原始 HTML 模板和「经典海蓝」主题由其创建。在此感谢原作者的开源贡献。
+
+---
+
 ## License
 
 MIT
