@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="AI Native HTML 简历">
+    <title>简历 - AI Native Resume</title>
+    <link rel="stylesheet" href="themes/default.css" id="theme-stylesheet">
+  </head>
+  <body>
+    <div class="resume-shell">
+      <aside class="control-panel" aria-label="简历操作">
+        <div>
+          <p class="eyebrow">HTML Resume</p>
+          <h1>AI 可读、可改、可投递的简历</h1>
+          <p>这份页面由结构化数据驱动。修改内容时编辑 <code>resume-data.js</code>，切换风格点击下方按钮，自定义样式编辑 <code>themes/</code>。</p>
+        </div>
+        <div class="actions">
+          <button type="button" data-action="switch-theme" id="theme-switcher">主题：经典海蓝（点击切换）</button>
+          <label class="upload-control" for="avatar-upload">
+            上传头像
+            <input id="avatar-upload" type="file" accept="image/png,image/jpeg,image/webp">
+          </label>
+          <button type="button" data-action="clear-avatar">清除头像</button>
+          <button type="button" data-action="print">打印 / 导出 PDF</button>
+          <button type="button" data-action="copy-image">保存图片并复制</button>
+          <p class="a4-fit-indicator" id="a4-fit-indicator"></p>
+        </div>
+      </aside>
+
+      <main class="resume-page" id="resume" aria-label="简历">
+        <section class="resume-header">
+          <div class="header-main">
+            <h2 id="candidate-name"></h2>
+            <p class="contact-line" id="candidate-contact"></p>
+            <p class="target" id="candidate-target"></p>
+          </div>
+          <div class="portrait" aria-label="头像占位">
+            <img id="candidate-avatar" alt="头像" hidden>
+            <span id="avatar-fallback"></span>
+          </div>
+        </section>
+
+        <section class="resume-section" id="education" aria-labelledby="education-title">
+          <div class="section-title">
+            <span></span>
+            <h3 id="education-title"></h3>
+          </div>
+          <div class="education-list" data-list="education"></div>
+        </section>
+
+        <section class="resume-section" id="internships" aria-labelledby="internships-title">
+          <div class="section-title">
+            <span></span>
+            <h3 id="internships-title"></h3>
+          </div>
+          <div class="entry-list" data-list="internships"></div>
+        </section>
+
+        <section class="resume-section" id="projects" aria-labelledby="projects-title">
+          <div class="section-title">
+            <span></span>
+            <h3 id="projects-title"></h3>
+          </div>
+          <div class="project-list" data-list="aiProjects"></div>
+        </section>
+
+        <section class="resume-section" id="skills" aria-labelledby="skills-title">
+          <div class="section-title">
+            <span></span>
+            <h3 id="skills-title"></h3>
+          </div>
+          <div class="skill-list" data-list="skills"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="resume-data.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

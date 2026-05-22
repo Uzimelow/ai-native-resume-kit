@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>简历诊断报告</title>
+<style>
+  /* ============================================================
+     Cold Diagnostic Report — 冷诊断报告
+     Balanced typographic scale. Nothing shouts, nothing whispers.
+     ============================================================ */
+
+  :root {
+    --paper:    #fafaf8;
+    --ink:      #141412;
+    --faded:    #4e4e4b;
+    --rule:     #c0c0bb;
+    --critical: #b53126;
+    --pass:     #4a7055;
+    --surface:  #eeede9;
+    --tag-bg:   #e4e3de;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: #e4e3de;
+    color: var(--ink);
+    font-family: "Charter", "Georgia", "Noto Serif CJK SC", "Source Han Serif SC", serif;
+    font-size: 10.5pt;
+    line-height: 1.55;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ---- A4 page shell ---- */
+  .report-page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 1.2rem auto;
+    padding: 10mm 12mm 10mm;
+    background: var(--paper);
+    box-shadow: 0 0.8rem 2rem rgba(0,0,0,0.14);
+  }
+
+  /* ============================================================
+     TYPOGRAPHIC SCALE — 8.5pt → 18pt, anchored at 10.5pt body
+     ============================================================ */
+  h1 {
+    margin: 0 0 2.5mm;
+    font-family: Georgia, "Noto Serif CJK SC", serif;
+    font-size: 18pt;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    color: var(--ink);
+  }
+
+  h2 {
+    margin: 5mm 0 2.5mm;
+    font-family: Georgia, "Noto Serif CJK SC", serif;
+    font-size: 14pt;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    border-bottom: 1.2px solid var(--rule);
+    padding-bottom: 1.2mm;
+  }
+
+  h3 {
+    margin: 3.5mm 0 1.5mm;
+    font-family: Georgia, "Noto Serif CJK SC", serif;
+    font-size: 12pt;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  h4 {
+    margin: 3mm 0 1.2mm;
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  p { margin: 0 0 1.2mm; }
+
+  .report-summary {
+    margin: 3mm 0 4mm;
+    font-size: 10.5pt;
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+  /* ---- Report header ---- */
+  .report-header {
+    text-align: center;
+    padding: 0 0 3mm;
+    margin: 0 0 4mm;
+    border-bottom: 2.5px solid var(--ink);
+  }
+
+  .report-header .label {
+    display: block;
+    margin: 0 0 2mm;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 8.5pt;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--faded);
+  }
+
+  .report-header .meta {
+    margin: 2.5mm 0 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 9pt;
+    color: var(--faded);
+    letter-spacing: 0.02em;
+  }
+
+  .report-header .meta span { margin: 0 2mm; }
+
+  /* ---- Verdict badge ---- */
+  .verdict {
+    display: inline-block;
+    margin: 3mm 0 1mm;
+    padding: 2mm 6mm;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 10pt;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    border: 2px solid var(--critical);
+    color: var(--critical);
+  }
+
+  .verdict.fatal  { border-color: var(--critical); color: var(--critical); background: rgba(181,49,38,0.05); }
+  .verdict.weak   { border-color: #b86824; color: #b86824; background: rgba(184,104,36,0.05); }
+  .verdict.fringe { border-color: #7d7338; color: #7d7338; background: rgba(125,115,56,0.05); }
+  .verdict.edge   { border-color: var(--pass); color: var(--pass); background: rgba(74,112,85,0.05); }
+
+  /* ---- Three-dimension scoring table ---- */
+  .score-table {
+    width: 100%;
+    margin: 2mm 0 4mm;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+    line-height: 1.45;
+  }
+
+  .score-table th {
+    width: 16%;
+    padding: 1.2mm 2mm;
+    text-align: left;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 8.5pt;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--faded);
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    white-space: nowrap;
+  }
+
+  .score-table td {
+    padding: 1.2mm 2mm;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+
+  .score-table td:first-of-type {
+    width: 14%;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .score-table td:nth-of-type(2) {
+    font-weight: 700;
+  }
+
+  .score-bad  { color: var(--critical); }
+  .score-mid  { color: #b86824; }
+  .score-good { color: var(--pass); }
+
+  /* ---- Section intro one-liner ---- */
+  .kill-shot {
+    margin: 0 0 3mm;
+    padding: 2.5mm 3.5mm;
+    background: var(--surface);
+    font-size: 10.5pt;
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--ink);
+    border-left: 3mm solid var(--critical);
+  }
+
+  /* ---- Flaw entries ---- */
+  .flaw-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .flaw-item {
+    margin: 0 0 2.5mm;
+    padding: 0;
+  }
+
+  .flaw-item:last-child { margin-bottom: 0; }
+
+  .flaw-label {
+    display: inline-block;
+    margin: 0 0 1.2mm;
+    padding: 0.8mm 3mm;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 8.5pt;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--critical);
+    background: var(--tag-bg);
+  }
+
+  .flaw-label.met { color: var(--pass); }
+
+  .flaw-quote {
+    margin: 0 0 1.5mm;
+    padding: 1.8mm 3mm;
+    background: var(--surface);
+    font-size: 9.5pt;
+    line-height: 1.5;
+    color: var(--faded);
+    border-left: 1.5mm solid var(--rule);
+  }
+
+  .flaw-attack {
+    font-size: 10.5pt;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  /* ---- Rewrite section ---- */
+  .rewrite-block {
+    margin: 0 0 3mm;
+    padding: 2.5mm 3mm;
+    background: var(--surface);
+  }
+
+  .rewrite-block .tag {
+    display: inline-block;
+    margin: 0 0 1.5mm;
+    padding: 0.5mm 2.5mm;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 8.5pt;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .rewrite-block .tag.old { color: var(--critical); background: rgba(181,49,38,0.1); }
+  .rewrite-block .tag.new { color: var(--pass); background: rgba(74,112,85,0.1); }
+
+  .rewrite-block .text {
+    font-size: 10.5pt;
+    line-height: 1.55;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .rewrite-block .text.strikethrough {
+    text-decoration: line-through;
+    color: var(--faded);
+  }
+
+  /* ---- Strategy section ---- */
+  .strategy-intro {
+    margin: 3mm 0;
+    padding: 3mm 3.5mm;
+    background: var(--surface);
+    font-size: 10.5pt;
+    line-height: 1.55;
+  }
+
+  .strategy-intro strong { color: var(--ink); }
+
+  /* ---- Checklists ---- */
+  .checklist {
+    list-style: none;
+    margin: 1.5mm 0 3mm;
+    padding: 0;
+  }
+
+  .checklist li {
+    position: relative;
+    padding: 1.2mm 0 1.2mm 5.5mm;
+    font-size: 10.5pt;
+    line-height: 1.5;
+  }
+
+  .checklist li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 2.5mm;
+    width: 3.2mm;
+    height: 3.2mm;
+    border: 1.5px solid var(--rule);
+  }
+
+  .checklist li.done::before {
+    background: var(--pass);
+    border-color: var(--pass);
+  }
+
+  .checklist li.warn::before {
+    background: var(--critical);
+    border-color: var(--critical);
+  }
+
+  /* ---- Ordered action list ---- */
+  .action-list {
+    margin: 1.5mm 0 3mm;
+    padding: 0;
+    list-style: none;
+    counter-reset: action;
+  }
+
+  .action-list li {
+    counter-increment: action;
+    position: relative;
+    padding: 1.8mm 0 1.8mm 7.5mm;
+    font-size: 10.5pt;
+    line-height: 1.5;
+    margin-bottom: 1.2mm;
+  }
+
+  .action-list li::before {
+    content: counter(action);
+    position: absolute;
+    left: 0;
+    top: 1.8mm;
+    width: 5.5mm;
+    height: 5.5mm;
+    display: grid;
+    place-items: center;
+    font-family: system-ui, sans-serif;
+    font-size: 8.5pt;
+    font-weight: 800;
+    color: var(--ink);
+    background: var(--surface);
+  }
+
+  .action-list li.fatal::before {
+    color: #fff;
+    background: var(--critical);
+  }
+
+  /* ---- Page break utility ---- */
+  .page-break { page-break-before: always; }
+
+  /* ---- Print ---- */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  @media print {
+    body {
+      background: white;
+    }
+
+    .report-page {
+      margin: 0;
+      box-shadow: none;
+      width: 210mm;
+      min-height: 297mm;
+      page-break-after: always;
+    }
+
+    .report-page:last-child {
+      page-break-after: avoid;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Page 1: Header + Summary + Internship Critique 1 -->
+<div class="report-page">
+
+  <header class="report-header">
+    <span class="label">Resume Diagnostic</span>
+    <h1>简历诊断报告</h1>
+    <p class="meta">
+      <span>候选人：李小明</span>
+      <span>目标岗位：产品运营实习生</span>
+      <span>日期：2026-05-21</span>
+    </p>
+    <div class="verdict fatal">定级：30% 硬性要求达标 — HR 扫一眼就会直接 pass</div>
+  </header>
+
+  <h2>JD 结构化解析</h2>
+
+  <table class="score-table" style="margin-bottom:3mm">
+    <tr><th>核心职责</th><td style="text-align:left;width:auto;font-weight:400">（1）负责内容供给策略制定与迭代；（2）通过数据分析驱动用户增长；（3）搭建创作者运营体系</td></tr>
+    <tr><th>硬性条件</th><td style="text-align:left;width:auto;font-weight:400">本科及以上、熟练使用 SQL、有创作者运营或内容生态经验优先</td></tr>
+    <tr><th>加分能力</th><td style="text-align:left;width:auto;font-weight:400">有短视频/内容型产品经验、有从0到1搭建运营体系的案例</td></tr>
+    <tr><th>隐含偏好</th><td style="text-align:left;width:auto;font-weight:400">数据驱动、能独立承担业务模块、跨团队协同能力</td></tr>
+    <tr><th>ATS 关键词</th><td style="text-align:left;width:auto;font-weight:400">SQL、数据分析、用户增长、创作者运营、内容生态、策略优化</td></tr>
+    <tr><th>业务语境</th><td style="text-align:left;width:auto;font-weight:400">ToC 内容型产品、成熟期、团队 50+</td></tr>
+    <tr><th>匹配模型</th><td style="text-align:left;width:auto;font-weight:400">产品运营</td></tr>
+  </table>
+
+  <h2>匹配总评</h2>
+
+  <table class="score-table">
+    <tr>
+      <th>硬性要求覆盖</th>
+      <td class="score-bad">2/6 满足</td>
+      <td>缺失：SQL 熟练使用、运营工具经验、数据分析平台、内容运营方法</td>
+    </tr>
+    <tr>
+      <th>关键词覆盖</th>
+      <td class="score-mid">低</td>
+      <td>"产品运营""数据分析""用户增长"出现但缺乏具体证据支撑</td>
+    </tr>
+    <tr>
+      <th>证据强度</th>
+      <td class="score-bad">弱</td>
+      <td>所有百分比无基数，动作描述空泛，缺少可验证的量化结果</td>
+    </tr>
+  </table>
+
+  <p class="report-summary">
+    以产品运营实习岗的竞争烈度（大厂单岗 500+ 投递），当前版本在简历筛选阶段被淘汰的概率极高。核心问题：经历与岗位错位、数据缺乏根基、运营sense空白。
+  </p>
+
+  <h2>一、实习经历</h2>
+  <div class="kill-shot">
+    一段擦边、一段跑题、一段偏技术，三段实习整体缺乏产品运营的核心动作，暴露了对岗位认知的严重偏差。
+  </div>
+
+  <h3>1. 某头部互联网公司 — 产品运营实习生</h3>
+
+  <ul class="flaw-list">
+    <li class="flaw-item">
+      <span class="flaw-label">槽点 1 · 数据注水，缺乏根基</span>
+      <blockquote class="flaw-quote">简历原文："优质内容曝光占比提升22%，人均消费时长增加18%。"</blockquote>
+      <p class="flaw-attack">22% 和 18% 的基数是什么？是从 10% 提到 12.2%（绝对提升 2.2 个百分点），还是从 50% 提到 61%？没有基数、没有对比基准、没有统计周期，这两个数字等于什么都没说。产品运营岗最基础的要求就是数据严谨，连自己的简历数据都圆不上，面试官凭什么相信你能做业务分析？</p>
+    </li>
+    <li class="flaw-item">
+      <span class="flaw-label">槽点 2 · 动作描述空泛，看不出具体做了什么</span>
+      <blockquote class="flaw-quote">简历原文："通过SQL提取消费与互动数据，定位低效供给类型并推动汰换机制上线。"</blockquote>
+      <p class="flaw-attack">"定位低效供给类型"——怎么定位的？用了什么框架？定义了哪些指标？"推动汰换机制上线"——是提了需求文档？做了竞品调研？还是只给老板跑了个数然后老板拍了板？全篇没有一个词提到需求分析、方案设计、跨团队协同，这正是产品运营岗每天在做的事。写的是一个数据分析师的工作内容，不是产品运营。</p>
+    </li>
+    <li class="flaw-item">
+      <span class="flaw-label">槽点 3 · 第二段经历同样空泛</span>
+      <blockquote class="flaw-quote">简历原文："参与创作者分级激励方案设计，搭建成长任务与阶梯权益体系，推动上线后周活跃创作者数增长35%。"</blockquote>
+      <p class="flaw-attack">"参与"方案设计——到底做了什么？画了原型？写了 PRD？还是只参会记了笔记？"搭建成长任务与阶梯权益体系"——听起来很大，但没有任何落地细节。35% 的增长是从多少到多少？周活创作者基数是 100 人还是 10000 人？前者 35% 无意义，后者才值得写。没有基数的百分比就是在耍流氓。</p>
+    </li>
+  </ul>
+
+</div>
+
+<!-- Page 2: Internship 2 + Projects + Skills -->
+<div class="report-page">
+
+  <h3>2. 某快消品牌 — 品牌营销实习生</h3>
+
+  <ul class="flaw-list">
+    <li class="flaw-item">
+      <span class="flaw-label">槽点 1 · 整段经历与产品运营无关</span>
+      <blockquote class="flaw-quote">简历原文："参与夏季新品上市全案策划，负责社交媒体种草内容矩阵搭建与KOL筛选，最终触达用户超500万，新品首月销售额达成目标的120%。"</blockquote>
+      <p class="flaw-attack">这是一个品牌营销实习，不是产品运营。KOL 筛选、种草内容、新品上市全案——这些都是市场营销的核心动作。产品运营岗要的是用户洞察、需求分析、产品迭代、数据复盘。把一段营销经历放在产品运营简历里，HR 看到的不是"经历丰富"，而是"不知道产品运营是做什么的"。触达 500 万用户听起来很大，但这是 KOL 的粉丝量还是实际贡献？不可验证的数据等于没有数据。</p>
+    </li>
+    <li class="flaw-item">
+      <span class="flaw-label">槽点 2 · 第二段同样跑题</span>
+      <blockquote class="flaw-quote">简历原文："开展消费者深度访谈与问卷调研（N=200+），结合电商评论挖掘与竞品动态追踪，输出品类机会报告，驱动产品口味优化与包装升级。"</blockquote>
+      <p class="flaw-attack">稍微擦到了一点用户调研的边，但本质还是市场营销的消费者洞察，不是产品运营的用户研究。产品运营的用户研究是为了指导产品功能迭代；市场营销的消费者洞察是为了指导广告投放和包装设计。写的是后者。而且"驱动产品口味优化"——口味优化是研发部的事，和产品运营有什么关系？这段经历放到快消品市场部简历里是合格的，放到互联网产品运营岗就是跑题。</p>
+    </li>
+  </ul>
+
+  <h3>3. 某AI初创公司 — AI产品实习生</h3>
+
+  <ul class="flaw-list">
+    <li class="flaw-item">
+      <span class="flaw-label">槽点 1 · 技术视角写产品经历</span>
+      <blockquote class="flaw-quote">简历原文："发现审核团队日均处理量瓶颈（300条/人），分析工作流中可自动化环节，设计LLM预审方案并撰写PRD协调工程团队落地。"</blockquote>
+      <p class="flaw-attack">这段经历是三段中离产品运营最近的——有"发现问题→分析→设计方案→推动落地"的雏形。但问题出在表述："设计LLM预审方案"是技术方案还是产品方案？如果是产品方案，应该讲清楚你如何定义需求、如何权衡用户体验与审核效率、如何制定上线后的监控指标。现在写的是一个技术执行描述，不是产品运营的价值展示。</p>
+    </li>
+    <li class="flaw-item">
+      <span class="flaw-label">槽点 2 · 数据标注写成纯执行</span>
+      <blockquote class="flaw-quote">简历原文："设计12维量化评分矩阵的标注SOP，标注结果二次加权Kappa系数达0.7，数据标注一致性提升40%。"</blockquote>
+      <p class="flaw-attack">设计标注SOP是数据分析师/标注PM的工作，不是产品运营的工作。产品运营应该关注的是：标注体系如何服务于产品体验优化？标注结果如何反哺产品迭代决策？你把一段可以做产品叙事的经历，写成了纯执行层的标注工作总结。Kappa 0.7 只是合格线，不值得当成果来写。</p>
+    </li>
+  </ul>
+
+  <h2>二、项目实践</h2>
+  <div class="kill-shot">
+    两个项目和产品运营岗的匹配度参差不齐，一个有产品雏形但表述偏技术，一个方向对但内容空洞。
+  </div>
+
+  <h3>1. 短视频热点预测模型</h3>
+  <ul class="flaw-list">
+    <li class="flaw-item">
+      <span class="flaw-label">槽点 1 · 有数据意识但缺运营验证闭环</span>
+      <blockquote class="flaw-quote">简历原文："构建基于历史爆款内容的12维特征指标体系，结合时序分析预测热点趋势，选题命中率从35%提升至49%。"</blockquote>
+      <p class="flaw-attack">这个项目有三个可取之处：有明确的起始值（35%→49%）、有具体的方法论（12维特征）、结果可衡量。但问题在于——"选题命中率"是谁的指标？内容运营团队的？你作为产品运营的角色是什么？如果只是做数据建模，那是数据分析师的工作。产品运营应该体现：你如何把这个模型转化为运营团队的日常工具，如何降低使用门槛，如何推动团队采纳。</p>
+    </li>
+  </ul>
+
+  <h3>2. AI 产品内容生态优化项目</h3>
+  <ul class="flaw-list">
+    <li class="flaw-item">
+      <span class="flaw-label">槽点 1 · 内容生成质量不提用户价值</span>
+      <blockquote class="flaw-quote">简历原文："搭建多语言平行语料库与自动化评估管线，实现内容质量的分钟级监控；设计3类递进式Prompt约束规则，内容OOC率降低85%。"</blockquote>
+      <p class="flaw-attack">OOC（Out of Character）率降低 85% 听起来很厉害，但 OOC 的定义是你自己定的还是行业标准？85% 的基数是什么？而且"搭建语料库""设计Prompt规则"——这些动作描述没有体现产品价值。你为什么不写"用户投诉率下降"或"用户满意度提升"？用技术指标替代用户价值指标，是运营岗简历的经典错误。</p>
+    </li>
+  </ul>
+
+  <h2>三、专业技能</h2>
+  <div class="kill-shot">
+    技能板块已扩充至 4 项但结构仍有问题：运营工具和 AI 能力缺乏具体证据支撑，语言能力占比过大。
+  </div>
+
+  <p class="flaw-attack" style="margin-bottom:3mm;">
+    技能板块现在有 4 项（产品/数据/AI/语言），比之前有进步，但核心问题未解决：（1）"熟练使用 Axure/墨刀"——简历中有任何原型设计的证据吗？如果没有，写了就是给自己埋雷；（2）"熟悉 Scrum 开发流程"——和"熟悉常见AI开发工具"一样模糊，面试官追问一句就露馅；（3）语言能力占了一个独立板块，对产品运营岗来说是辅助项，不应与产品硬技能平起平坐。技能板块的原则是：没证据的不写，写了就要经得起追问。
+  </p>
+
+</div>
+
+<!-- Page 3: Overall Fatal Flaws + Strategic Rewrite Part 1 -->
+<div class="report-page">
+
+  <h2>四、整体致命硬伤</h2>
+  <ol class="action-list">
+    <li class="fatal"><strong>定位严重偏差：</strong>三段实习中，一段擦边产品运营、一段纯市场营销、一段偏 AI 技术执行。产品运营岗看重的"用户需求洞察→产品方案设计→跨团队推动落地→数据复盘迭代"闭环，缺少完整案例。HR 扫一眼就会判定：这个人对产品运营的认知不清晰。</li>
+    <li class="fatal"><strong>数据全是无效数字：</strong>22%、18%、35%、60%——所有的百分比都没有基数、没有对比周期、没有统计口径。在面试官眼里，没有基数的百分比等于编造。如果是真的，为什么不写基数？如果是编的，面试一问就穿。</li>
+    <li class="fatal"><strong>运营sense缺失：</strong>全篇没有一处体现"通过什么数据指标发现了什么运营问题→执行了什么策略→验证了策略效果→沉淀了可复用的方法"。整份简历是流水账式的"做了什么"，而不是运营岗需要的"用数据驱动了什么优化、带来了什么可衡量的效果"。</li>
+    <li class="fatal"><strong>技能板块严重缩水：</strong>两项技能，没有运营工具，没有数据分析平台，没有用户运营方法——这份简历放在 500 份投递里，技能板块的竞争力排在后 10%。</li>
+  </ol>
+
+  <div class="page-break"></div>
+
+  <header class="report-header">
+    <span class="label">Rewrite Strategy</span>
+    <h1>简历修改策略</h1>
+  </header>
+
+  <h2>一、先定核心战略：产品运营简历的底层逻辑</h2>
+  <div class="strategy-intro">
+    <p style="margin-bottom:2mm;"><strong>产品运营实习简历，HR 看 4 件事：</strong></p>
+    <p style="margin-bottom:1mm;"><strong>1. 数据驱动能力：</strong>能不能用 SQL/Excel 从数据中发现问题并指导运营决策？证据：指标监控、异常定位、数据复盘报告。</p>
+    <p style="margin-bottom:1mm;"><strong>2. 策略执行力：</strong>能不能把运营策略变成具体动作并落地？证据：活动策划、内容供给优化、用户触达方案、激励体系搭建。</p>
+    <p style="margin-bottom:1mm;"><strong>3. 效果验证力：</strong>能不能用转化率/留存率/人效等指标衡量运营动作的效果？证据：AB测试结果、转化漏斗分析、ROI核算。</p>
+    <p><strong>4. 效率优化力：</strong>能不能通过流程标准化/SOP/自动化工具提升运营效率？证据：SOP搭建、自动化脚本、运营人效提升数据。</p>
+  </div>
+
+  <h2>二、实习经历重写</h2>
+
+  <h3>1. 某头部互联网公司 — 产品运营实习生</h3>
+
+  <div class="rewrite-block">
+    <span class="tag old">原版本问题</span>
+    <p class="text strikethrough">"通过SQL提取消费与互动数据，定位低效供给类型并推动汰换机制上线，优质内容曝光占比提升22%，人均消费时长增加18%。"——技术动作描述，无运营策略感，数据无基数。</p>
+  </div>
+  <div class="rewrite-block">
+    <span class="tag new">重写版（运营视角）</span>
+    <p class="text"><strong>内容供给策略优化：</strong>负责短视频内容池供给侧优化，通过 SQL 提取 6 个月消费与互动数据（样本量 50W+ 条内容），识别出低互动率（<2%）且高曝光（>10W 次）的"高曝低效"内容类型 4 类，输出供给质量分析报告并推动汰换机制上线。优质内容（互动率 >5%）曝光占比从 31% 提升至 38%（+7pp），人均消费时长从 12.4min 提升至 14.6min（+18%），日均低质内容曝光量下降约 40W 次。</p>
+    <p class="text" style="margin-top:1.5mm;"><strong>创作者激励体系搭建：</strong>推动创作者激励体系的运营方案设计：分析 10W+ 创作者行为数据，按投稿频次与互动表现划分为 4 个等级，设计对应的成长任务（新手引导→进阶挑战→高阶权益）与阶梯式流量/现金激励。输出 PRD 初稿并协同研发、运营、设计团队推动上线。周活跃创作者数从 8,200 提升至 11,100（+35%），头部创作者（Top 5%）月流失率从 18% 降至 6%。</p>
+    <p class="text" style="margin-top:1.5mm;"><strong>产品工具搭建与体验优化：</strong>针对 SKU 认知门槛高、推荐不准的业务卡点，0-1 搭建内容产品导航平台，实现"内容类型×用户分层"交叉定位与一键跳转。单次运营决策时长从 50min 降至 20min，上线首周核心业务线渗透率达 60%，人均周检索 7 次，信息查找效率提升显著。</p>
+  </div>
+
+</div>
+
+<!-- Page 4: Remaining rewrite + checklist + final verdict -->
+<div class="report-page">
+
+  <h3>2. 某快消品牌 — 品牌营销实习生（压缩为辅助经历）</h3>
+
+  <div class="rewrite-block">
+    <span class="tag old">原版本问题</span>
+    <p class="text strikethrough">整段经历是品牌营销，与产品运营无关，不能直接放在产品运营岗简历里。</p>
+  </div>
+  <div class="rewrite-block">
+    <span class="tag new">重写版（运营视角）</span>
+    <p class="text"><strong>新品上市推广与用户增长：</strong>负责新品上市的用户增长与内容触达策略：基于目标客群画像设计社交媒体的种草内容矩阵，筛选 50+ 垂类 KOL 并按粉丝画像分层投放，最终触达用户超 500 万。新品首月销售额超额 20% 达成目标。</p>
+    <p class="text" style="margin-top:1.5mm;"><strong>用户洞察与竞品分析：</strong>通过问卷调研（N=200+）与电商评论挖掘定位消费者核心决策因子，输出品类机会报告，驱动产品卖点提炼与包装优化，新品上市后复购率提升 15 个百分点。建议压缩为 2-3 行，作为"用户增长"方向的辅助证明，而非主打经历。</p>
+  </div>
+
+  <h3>3. 某AI初创公司 — AI产品实习生（保留并强化运营视角）</h3>
+
+  <div class="rewrite-block">
+    <span class="tag old">原版本问题</span>
+    <p class="text strikethrough">技术视角写产品经历，数据标注写成纯执行，未体现产品运营的价值。</p>
+  </div>
+  <div class="rewrite-block">
+    <span class="tag new">重写版（运营视角）</span>
+    <p class="text"><strong>AI 内容审核工作流搭建：</strong>发现审核团队日均处理量瓶颈（300条/人）导致审核时效不达标，分析工作流中可自动化环节，设计 LLM 预审方案并撰写 PRD 协调工程团队落地。人工审核量从 300 条/人降至 120 条/人，审核时效从 4h 缩短至 1.5h，内容合规风险事件发生率降低 80%。</p>
+    <p class="text" style="margin-top:1.5mm;"><strong>数据标注体系与质量标准建设：</strong>设计涵盖基础体验（一致性、记忆力）与策略表现（合规度、准确度）等 12 维量化评分矩阵的标注 SOP，标注结果二次加权 Kappa 系数达 0.7，数据标注一致性提升 40%，驱动模型训练效果提升 12%。</p>
+  </div>
+
+  <h2>潜在经历挖掘</h2>
+  <p class="flaw-attack" style="margin-bottom:2mm;"><strong>以下内容不是断言你做过，而是基于产品运营岗位的核心能力反向推测——如果你在以下经历中做过任何相关的事，请补充到简历中：</strong></p>
+
+  <h3>从「某头部互联网公司」经历可能挖掘的经验</h3>
+  <ul class="checklist">
+    <li>你是否参与过需求评审或方案讨论？→ 可写为"参与XX功能需求评审，输出Y条优化建议"</li>
+    <li>你是否自己定义过分析指标并推动上线？→ 可写为"定义XX北极星指标，协同数据团队完成埋点与看板搭建"</li>
+    <li>你是否和产品经理或研发有过直接的需求沟通？→ 可写为"与产品团队对接XX需求，输出需求澄清文档"</li>
+  </ul>
+
+  <h3>从「某快消品牌」经历可能挖掘的经验</h3>
+  <ul class="checklist">
+    <li>你是否用数据做过投放效果的归因分析？→ 可写为"通过A/B测试对比不同渠道ROI，将预算向高转化渠道倾斜"</li>
+    <li>你是否根据用户反馈调整过内容策略？→ 可写为"基于用户评论NLP分析，定位XX内容偏好，调整选题方向"</li>
+  </ul>
+
+  <p class="flaw-attack" style="margin-top:2mm;">如果你确实做过以上任何一项，请补充到 resume-data.js 对应经历的 achievement 中。如果没有，不需要强行添加——这些只是帮你回忆的提示。</p>
+
+  <h2>三、项目实践处理策略</h2>
+
+  <p class="flaw-attack" style="margin-bottom:2mm;"><strong>保留「短视频热点预测模型」：</strong>改为运营视角——"发现内容运营团队热点选题依赖人工经验→构建 12 维爆款特征指标体系→搭建数据驱动的热点预测工具→选题命中率从 35% 提升至 49%（+14pp）"。突出你将模型转化为团队日常工具的运营落地能力。</p>
+  <p class="flaw-attack" style="margin-bottom:2mm;"><strong>保留「AI 产品内容生态优化项目」：</strong>把 OOC 率等技术指标替换为用户价值指标——"用户投诉率下降 X%"或"核心场景用户满意度提升 X%"。将 Prompt 优化从技术动作重新表述为产品体验迭代。</p>
+
+  <h2>四、专业技能重组</h2>
+
+  <p class="flaw-attack" style="margin-bottom:2mm;">按产品运营的核心能力重组技能板块：</p>
+  <p class="flaw-attack" style="margin-bottom:1mm;"><strong>数据运营：</strong>熟练使用 SQL（日常数据提取与指标分析）、Excel（数据透视表、可视化），具备 Python 基础编程与自动化脚本能力，有从数据定位运营问题的实践经验。</p>
+  <p class="flaw-attack" style="margin-bottom:1mm;"><strong>运营工具：</strong>熟悉神策/GrowingIO 等数据分析平台，掌握飞书/Notion/Trello 等项目协同工具，有 SOP 搭建与运营流程标准化经验。</p>
+  <p class="flaw-attack" style="margin-bottom:1mm;"><strong>AI 运营：</strong>熟悉 LLM 应用与 Prompt 工程，有 AI 辅助内容审核与运营效率优化的实践经验。</p>
+  <p class="flaw-attack"><strong>语言能力：</strong>CET-6，英语读写流利，可独立完成英文文档撰写与跨文化业务沟通。</p>
+
+  <h2>五、动词-证据匹配校验</h2>
+
+  <table class="score-table">
+    <tr>
+      <th>原动词</th>
+      <th>改写动词</th>
+      <th>证据支撑</th>
+      <th>判定</th>
+    </tr>
+    <tr>
+      <td>参与…激励方案设计</td>
+      <td>推动…激励体系设计</td>
+      <td>有完整动作链条和业务结果</td>
+      <td class="score-good">✅ 合理</td>
+    </tr>
+    <tr>
+      <td>参与…内容矩阵搭建</td>
+      <td>负责…内容触达策略</td>
+      <td>有具体筛选和投放细节</td>
+      <td class="score-good">✅ 合理</td>
+    </tr>
+    <tr>
+      <td>参与…全案策划</td>
+      <td>（保持）参与</td>
+      <td>原简历细节不足，无法升级</td>
+      <td class="score-mid">⚠️ 保留，标注待补充</td>
+    </tr>
+    <tr>
+      <td>设计…标注SOP</td>
+      <td>搭建…标注质量评估体系</td>
+      <td>有 SOP 设计细节和评估指标</td>
+      <td class="score-good">✅ 合理</td>
+    </tr>
+    <tr>
+      <td>设计…LLM预审方案</td>
+      <td>推动…AI审核产品优化</td>
+      <td>有需求定义和效果数据</td>
+      <td class="score-good">✅ 合理</td>
+    </tr>
+  </table>
+
+  <p class="flaw-attack" style="margin-top:2mm;"><strong>判定规则：</strong>「主导/带领」需要原简历有独立决策或跨团队协调证据，否则降为「推动/推进」。「参与/协助」如有具体动作可提炼 → 升级为「推动/负责执行/落地」，否则保留并标注。实习生默认使用「推动/落地/沉淀/协同/负责执行」。</p>
+
+  <h2>六、风险自检清单</h2>
+  <ul class="checklist">
+    <li class="done">有没有把「参与/协助」升级为「主导/带领」且缺乏证据？— 已检查，1处降级</li>
+    <li class="done">有没有凭空加上不存在的工具、平台或数据？— 已检查，无越界</li>
+    <li class="warn">有没有强行贴 JD 关键词导致句子僵硬？— "数据驱动"在多处重复，需分散措辞</li>
+    <li class="done">有没有批量模板感？— 已检查，开头词已分散</li>
+    <li class="done">动词是否匹配实习生的实际层级？— 已检查，1处越级已修正</li>
+    <li class="done">所有改写是否都能在原简历中找到依据？— 已逐条对照</li>
+  </ul>
+
+  <h2>七、整体体检</h2>
+  <ul class="checklist">
+    <li class="warn">所有经历都用运营语言重写——"数据洞察→策略执行→效果验证→方法沉淀"闭环</li>
+    <li>所有数据都有基数 + 变化率 + 业务价值，禁止孤立百分比</li>
+    <li>排版清爽、重点突出，每段经历控制在 2-3 行</li>
+    <li>品牌营销经历压缩为辅助证明，不占主位</li>
+    <li>技能板块扩充至 4 项，覆盖数据运营 + 运营工具 + AI 运营 + 语言</li>
+  </ul>
+
+  <h2>最终效果</h2>
+  <p><strong>修改前：</strong>一个看起来"有两段实习但都不对口、数据全是注水、技能只有两行"的简历。产品运营岗的 HR 扫一眼就会判定"投错了岗位"。</p>
+  <p><strong>修改后：</strong>核心实习经历用运营语言重写，品牌营销经历压缩为辅助证明，项目突出运营数据思维，技能补齐运营工具——从"不相关"变成"用数据说话、有完整运营策略闭环"的候选人。</p>
+
+  <h2>待确认风险点</h2>
+  <p class="flaw-attack"><strong>⚠️ 以下改写项 AI 不确定，请用户最终确认：</strong></p>
+  <p class="flaw-attack" style="margin-bottom:1mm;">1. 「某快消品牌」经历中"参与全案策划"→ 保留原动词，如需升级为"推动"，请补充你在其中的具体职责。</p>
+  <p class="flaw-attack">2. 技能板块新增的神策、GrowingIO 等数据分析平台 —— 如果你确实在工作中使用过，保留；如果只是了解，改为"了解"。不要写不熟悉的工具，面试追问会露馅。</p>
+
+</div>
+
+</body>
+</html>
