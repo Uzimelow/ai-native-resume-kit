@@ -22,20 +22,21 @@
 
 ## 快速开始
 
-本工具设计为配合 AI 编程助手使用（Claude Code、Codex、Trae 等均可）。
+本工具配合 AI 编程助手使用（Claude Code、Codex、Trae 等均可）。
 
-1. 将 `ai-native-resume-kit.skill` 安装到 AI 助手的 Skills 目录
-2. 上传你的 PDF/DOCX 简历和目标岗位 JD
-3. AI 会自动读取简历内容，抽取姓名、教育、实习、项目、技能等信息，填充到 `resume-data.js` 中，并在浏览器中打开预览
-4. 如果提供了 JD，AI 会进一步：
-   - 对 JD 做六维解析（核心职责、硬性条件、加分能力、隐含偏好、关键词、业务语境）
-   - 建立 JD 要求与简历证据的匹配矩阵，逐项打分
-   - 生成一份带批判性诊断的 `jd-match-report.html` 评估报告
-   - 基于评估结果定制 HTML 简历：重排经历顺序、强化匹配关键词、压缩弱相关内容
-   - 所有修改基于真实经历，不编造、不夸大
-5. 导出最终成果（见下方导出说明）
+### 选一条适合你的路径
 
-如果不想使用 AI，也可以直接编辑 `assets/template/resume-data.js`，手动替换示例数据为你的真实经历，浏览器打开 `index.html` 即可预览。
+| 你的情况 | 对 AI 说 |
+|---------|---------|
+| 第一次用，有 PDF 简历 + JD | > 「帮我把这份简历 HTML 化，再评估匹配度」 |
+| 想长期投多个岗位 | > 「把简历存入素材库，以后每次给我匹配 JD 就行」 |
+| 已有 HTML 简历，只想改改 | > 「帮我润色这段实习经历」 |
+| 已有 HTML 简历 + 新 JD | > 「根据这个 JD 定制一版简历」 |
+| 只想看看模板长什么样 | 直接打开 [简历 Demo](https://uzimelow.github.io/ai-native-resume-kit/assets/template/index.html) · [报告 Demo](https://uzimelow.github.io/ai-native-resume-kit/assets/template/report-template.html) |
+
+AI 会自动读取文件、识别意图、走对应的处理流程。全过程由 AI 完成——你只需上传文件和确认改动。
+
+> 如果不想使用 AI，也可以直接编辑 `assets/template/resume-data.js`，替换示例数据为你的真实经历，浏览器打开 `index.html` 即可预览。
 
 ---
 

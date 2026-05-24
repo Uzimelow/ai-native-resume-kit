@@ -30,6 +30,22 @@ A complete pipeline for AI-native resume management: convert raw resumes into st
 - A4 fit indicator (live bottom-whitespace display)
 - Responsive control panel, print CSS (hides panel, renders A4 at exact size)
 
+## Path Selection Logic
+
+When the user mentions their resume, apply these rules in order to determine the path:
+
+1. User says "从素材库定制" / "素材库匹配" → **Path D** (library matching)
+2. User says "存入素材库" / "入库" → **Save to Material Library**
+3. User says "评估" / "诊断" + JD present → **Resume Evaluation**
+4. `material-library/library-data.js` exists AND user asks for JD tailoring but didn't specify a path → **suggest Path D**, fall back to Path B/C if user declines
+5. User uploads PDF/DOCX for the first time → **HTMLization first**, then suggest: (a) save to library, or (b) evaluate match if JD is also present
+6. User has existing resume-data.js but no library → suggest **Save to Material Library** after any edit
+7. User says "润色" / "polish" → **Resume Polishing**
+8. User says "招呼" / "self-intro" → **Self-Introduction**
+9. User says "导出" / "export" → **Export**
+
+If none of the above apply, ask the user what they want to do. Suggest the three main paths (A: one-shot / B: build library / C: light edit).
+
 ## Workflow Selection
 
 | User says | Workflow |
@@ -68,6 +84,8 @@ Convert a raw PDF/DOCX resume into the AI-native HTML format.
 9. Run the A4 fit loop until the page is well-filled.
 10. Export A4 PDF when requested.
 
+> After HTMLization: suggest saving to the material library. If the user has a JD ready, offer evaluation.
+
 ## Workflow: Save to Material Library (素材入库)
 
 Store all experiences from a `resume-data.js` into the persistent material library with AI-generated capability tags. Triggered explicitly or offered after every HTMLization.
@@ -101,6 +119,8 @@ Store all experiences from a `resume-data.js` into the persistent material libra
 - Use the exact dimension names from `tagDictionary` in `library-data.js`.
 - If the source role is not in tagDictionary, use the closest match and note it.
 - `ownership` must be traceable to the source text — never upgrade "参与" to "主导".
+
+> After saving to library: remind user that future JD tailoring can now use Path D (library matching). Ask if they have a JD ready.
 
 ## Workflow 2: Resume Evaluation
 
@@ -205,6 +225,8 @@ Example:
 - [ ] 你是否参与过需求讨论？→ 可写为"参与XX功能需求评审，提出Y条优化建议"
 - [ ] 你是否处理过用户反馈？→ 可写为"分类整理了N条用户反馈，定位X个高频痛点"
 
+> After evaluation: offer to proceed directly to JD Tailoring. If library exists, mention Path D as the faster option.
+
 ## Workflow 3: Resume Polishing
 
 Improve existing resume content. Edit `resume-data.js` only — in an output copy, never the template.
@@ -218,6 +240,8 @@ Improve existing resume content. Edit `resume-data.js` only — in an output cop
 7. Run STAR check on every achievement: Situation clear → Task explicit → Action concrete (no 参与/协助 without detail) → Result quantified (base + delta + business value).
 8. Follow Truthfulness Rules — never fabricate.
 9. Validate JS syntax. Re-run A4 fit if needed.
+
+> After polishing: suggest saving to library if not already there. Ask if user has a JD for further tailoring.
 
 ## Workflow 4: JD Tailoring
 
@@ -300,6 +324,8 @@ JD: [公司名-岗位名] | 识别模型: [模型名] ([维度1]+[维度2]+[维�
 7. Validate JS syntax, A4 fit, PDF export.
 8. Produce `jd-match-report.html` in output directory (Path C only).
 
+> After JD tailoring: remind user to export PDF for submission. Mention self-intro generation for recruiter outreach.
+
 ## Workflow 5: Self-Introduction Generation
 
 Generate a concise recruiter message (~180-280 Chinese characters) for platforms like WeChat, LinkedIn, BOSS直聘.
@@ -315,6 +341,8 @@ Generate a concise recruiter message (~180-280 Chinese characters) for platforms
 | Closing | 个人认为我"[differentiator]"的复合背景较为符合贵司[Position]的要求，希望能和您进一步沟通～ |
 
 **Rules:** Select 2 most JD-relevant internships. Extract 1-2 achievement highlights each. List specific tools with evidence ("SQL用于数据提取", not "会SQL"). Differentiator is a concise composite label ("翻译+AI产品运营"). Use "您" (formal), end with "～". Every claim must be traceable to `resume-data.js`. Save to `self-intro.html`.
+
+> After self-intro: offer to export final PDF or PNG for the user's outreach flow.
 
 ## Workflow: Material Library Management (素材库管理)
 
