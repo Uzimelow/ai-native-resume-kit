@@ -265,6 +265,14 @@ button:disabled:hover {
 	padding: 0.2mm 0;
 }
 
+.education-degree,
+.education-school,
+.education-college,
+.education-major,
+.education-period {
+	margin: 0;
+}
+
 /* ---- Bullet Lists ---- */
 .achievement-list,
 .skill-points {
