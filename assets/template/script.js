@@ -144,9 +144,9 @@ function renderInternships() {
 }
 
 function renderProjects() {
-  const container = document.querySelector('[data-list="aiProjects"]');
+  const container = document.querySelector('[data-list="projects"]');
 
-  data.aiProjects.forEach((item) => {
+  data.projects.forEach((item) => {
     const article = createElement("article", "project-item");
     const header = createElement("header", "project-header");
     header.append(createElement("h4", "project-title", item.title));

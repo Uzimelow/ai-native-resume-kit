@@ -92,7 +92,7 @@ window.resumeData = {
     }
   ],
 
-  aiProjects: [
+  projects: [
     {
       title:  "短视频热点预测模型",
       role:   "核心成员",

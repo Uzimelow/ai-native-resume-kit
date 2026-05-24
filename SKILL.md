@@ -241,7 +241,7 @@ window.resumeData = {
   sectionTitles: { /* keep as-is */ },
   education: [ /* { degree, school, college, major, period } */ ],
   internships: [ /* { company, role, period, achievements: [{ label, text }] } */ ],
-  aiProjects: [ /* { title, role, period, points: [string, string] } */ ],
+  projects: [ /* { title, role, period, points: [string, string] } */ ],
   skills: [ /* { label, text } */ ]
 };
 ```
