@@ -70,6 +70,16 @@
   4. `crossRefs` 机制：如果经历标签覆盖多个大类（如运营经历也适用于产品），在本文件记录跨类引用。大类内匹配不足时跨文件补充
 - **结果**：单个大类文件始终精简。AI 只加载 1 个 category file（~200 行）而非全量库（~400 行）。随着经历增多，token 节省效果递增
 
+### 测试 1：真实简历 × B端产品经理（全流程）
+
+- **输入**：赖沥的真实简历 + B端产品经理岗位模型（无具体 JD）
+- **发现的问题**：AI 初次执行评估时直接输出了纯文本而非 `jd-match-report.html` 文件——SKILL.md 中"用 report-template.html 生成 HTML 报告"的指令在文本输出模式下容易被跳过
+- **修复**：SKILL.md 的 evaluation workflow step 7 新增强调「MUST output an HTML file, never output evaluation as chat text」
+- **输出文件**：
+  - `jd-match-report.html`（4 页 A4 诊断报告：岗位模型解析 → 匹配总评 → 逐段批判 → 整体致命硬伤 → 重写策略 → 待确认风险点）
+  - `resume-data-b2b-pm.js`（定制版简历：重排经历顺序+重写为 B端叙事+压缩 C端经历+动词-证据校验）
+  - `self-intro.html`（260 字招呼话术，面向 B端产品实习生岗位）
+
 ---
 
 ## 设计决策原则

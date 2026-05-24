@@ -184,6 +184,10 @@ This persona's tone WINS over any formatting directive. The report structure def
 
 **7. 生成报告:** Read `assets/template/report-template.html` FIRST. Fill its placeholder content with findings. Keep its CSS, layout, and structure exactly as-is. Do NOT create new HTML design. The report MUST include all sections: 三维评分表 → 匹配总评 → 逐板块批判 → 整体致命硬伤 → 修改战略 → 动词校验 → 风险自检 → 待确认风险点.
 
+### ⚠️ CRITICAL: Output Format
+
+The evaluation deliverable is ALWAYS an HTML file (`jd-match-report.html`), NEVER plain chat text. After evaluation, the user should be able to open their browser and see a styled report — not scroll through a wall of text in the chat window. Read `assets/template/report-template.html` FIRST, fill its placeholders, and write the result to the output directory.
+
 ### Report Rules
 
 **Structure — Two Parts:**
