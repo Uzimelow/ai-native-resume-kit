@@ -17,7 +17,7 @@ A complete pipeline for AI-native resume management: convert raw resumes into st
 | `index.html` | A4 resume page with control panel |
 | `resume-data.js` | Structured resume data — the single edit target |
 | `script.js` | Rendering, avatar upload, PDF print, image capture, theme switch, A4 fit indicator |
-| `report-template.html` | Report base template for evaluation reports and self-intros |
+| `report-template.html` | Report base template for evaluation reports |
 | `themes/default.css` | 经典海蓝: 海军蓝+暖白、宋体排版 |
 | `themes/scholar.css` | 简约黑白: serif 字体、实线标题分隔、空心圆点列表 |
 
@@ -350,35 +350,45 @@ This turns every job application into an asset. Next time the user targets the s
 
 ## Workflow 5: Self-Introduction Generation
 
-Generate a recruiter message (~150 Chinese characters) for platforms like WeChat, LinkedIn, BOSS直聘. Output as a compact single-page HTML file. Save to `self-intro.html`.
+Generate a recruiter message (~240 Chinese characters / 5 paragraphs) for platforms like BOSS直聘, WeChat, LinkedIn. Output as an HTML file. Save to `self-intro.html`.
 
-### Layout (single-page, no scroll)
+### Layout
 
-**Header bar:** Title "打招呼话术" + meta (目标岗位, 字数). Navy bottom border.
+**Header:** Title "BOSS直聘招呼语" + meta line (目标岗位 | 字数 | 段落数).
 
-**Three-paragraph text card:**
+**Five-paragraph message box** (surface background `#eeede9`):
 
-| # | Weight | Content |
-|---|--------|---------|
-| P1 | 15% | 姓名 + 学校 + 意向岗位 — one line |
-| P2 | 60% | 核心经历（最 JD-relevant 的实习，2-3 条 achievement） + 辅助经历（另外 2 段各一个数据点）— merged into one dense paragraph |
-| P3 | 25% | 技能 + 差异化标签 ("B端产品设计+AI应用+英语国际化") + "～" closing |
+| # | Opening | Content |
+|---|---------|---------|
+| P1 | 招聘老师您好！ | 姓名 + 学校 + 意向岗位 — one sentence |
+| P2 | 在实习方面， | 最 JD-relevant 的实习 (core), 2-3 achievement highlights, data-first |
+| P3 | 在项目上， | Second internship + side projects — complementary evidence |
+| P4 | 在技术能力上， | Specific tools with evidence, certs, unique skills |
+| P5 | 个人认为 | 差异化标签 ("翻译行业理解×技术实操×产品意识") + "希望能和您进一步沟通～" |
 
-**Two-column footer (side-by-side, stacks on mobile):**
-- Left: Data traceability table — compact, each row maps a claim → `resume-data.js` field → evidence strength badge
-- Right: Design notes — 3 bullets: structure rationale, weight allocation, character-count justification
+**Copy button:** "复制话术到剪贴板". Copies `innerText` of the message box with newline normalization.
+
+**Data traceability table:** Dark-header table (`background: var(--ink); color: #fff`) with 3 columns: 话术声称 | resume-data.js 溯源 | 验证 (✓). Every factual claim in the intro must have a row.
+
+**Design notes:** Bulleted list (4 items max) explaining: experience selection rationale, experience placement decisions, differentiator label decomposition, traceability guarantee.
 
 ### Visual Design
-- Same design vocabulary as resume themes: navy (#1f347d), warm-white, Songti
-- Compact density: everything visible without scrolling on a laptop screen
-- Copy-to-clipboard button between text card and footer
-- Print CSS for PDF export
+
+```
+Color scheme:  --ink: #141412; --faded: #4e4e4b; --surface: #eeede9; --critical: #b53126; --pass: #4a7055
+Typography:    Charter, Georgia, "Noto Serif CJK SC", serif; 10.5pt body; 14pt headings
+Layout:        Single column, max-width 180mm, 2rem padding
+Table:         Dark header row (ink background, white text), light bordered rows
+Print:         @media print hides copy button; white background
+```
 
 ### Rules
-- Select 2 most JD-relevant internships for P2, compress others to one data point.
-- List specific tools with evidence ("SQL for data analysis", not "会SQL").
-- Differentiator: 3-part composite label. Use "您" (formal), end with "～".
-- ~150 chars — fit one message on BOSS直聘. Every claim traceable to `resume-data.js`.
+- Select the 2 most JD-relevant internships for P2. Place the strongest one first with full detail.
+- If a second internship is equally relevant, include it in P2. Otherwise, move it to P3 as a compressed data point.
+- Side projects go in P3 — keep them distinct from work experience to avoid misrepresenting scope.
+- Every skill claim must be traceable to `resume-data.js`. No evidence = don't write it.
+- Differentiator: 3-part label using "×" as separator. Map each part to verifiable evidence.
+- Use "您" (formal), end with "～". ~240 characters.
 
 > After self-intro: offer to export final PDF or PNG for the user's outreach flow.
 
