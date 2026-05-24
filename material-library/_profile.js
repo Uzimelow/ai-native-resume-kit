@@ -112,6 +112,42 @@ window.materialProfile = {
       models:        ["市场营销"],
       entries:       ["exp-002"],
       crossRefs:     {}
+    },
+    "产品大类": {
+      file:          "产品大类.js",
+      models:        ["C端产品经理", "B端产品经理", "商业化产品经理", "AI产品经理", "策略产品经理", "数据产品经理"],
+      entries:       [],
+      crossRefs:     {}
+    },
+    "市场大类": {
+      file:          "市场大类.js",
+      models:        ["渠道拓展", "市场推广", "商务合作"],
+      entries:       [],
+      crossRefs:     {}
+    },
+    "技术大类": {
+      file:          "技术大类.js",
+      models:        ["架构师", "前端工程师", "后端工程师", "移动端工程师", "测试工程师", "运维工程师"],
+      entries:       [],
+      crossRefs:     {}
+    },
+    "分析大类": {
+      file:          "分析大类.js",
+      models:        ["数据分析", "商业分析", "战略分析"],
+      entries:       [],
+      crossRefs:     {}
+    },
+    "设计大类": {
+      file:          "设计大类.js",
+      models:        ["产品设计"],
+      entries:       [],
+      crossRefs:     {}
+    },
+    "人力大类": {
+      file:          "人力大类.js",
+      models:        ["人力资源"],
+      entries:       [],
+      crossRefs:     {}
     }
   },
 
