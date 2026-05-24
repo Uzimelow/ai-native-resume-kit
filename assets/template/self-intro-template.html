@@ -12,31 +12,30 @@ h2{font-size:14pt;margin:5mm 0 2mm}
 @media print{body{background:white}.copy-btn{display:none}}
 </style></head><body>
 <h2>BOSS直聘招呼语</h2>
-<p style="color:var(--faded);font-size:9pt">目标岗位：百度翻译TOB产品实习生 | 字数：~240字 | 段落：5段</p>
+<p style="color:var(--faded);font-size:9pt">目标岗位：[公司名-岗位名] | 字数：~240字 | 段落：5段</p>
 <div class="msg-box" id="msg">
-<p><strong>招聘老师您好！</strong>我叫...，现就读于...，对百度翻译TOB产品方向有浓厚兴趣。</p>
-<p><strong>在实习方面，</strong>我曾在...</p>
-<p><strong>在项目上，</strong>我通过...</p>
-<p><strong>在技术能力上，</strong>我具备...</p>
-<p><strong>个人认为</strong>我「翻译行业理解×技术实操×产品意识」的复合背景较为符合贵司百度翻译TOB产品实习生的要求，希望能和您进一步沟通～</p>
+<p><strong>[P1 开头]</strong>[姓名]，现就读于[学校]，意向贵司[岗位名]。保留开头"招聘老师您好！"</p>
+<p><strong>[P2 实习经历]</strong>[最JD-relevant的实习，2-3条数据] + [第二段实习的一个关键数据点]。数据前置，用量化指标支撑。</p>
+<p><strong>[P3 项目实践]</strong>[side project或第三段实习的关键产出]。区分于工作经历，不混淆scope。</p>
+<p><strong>[P4 技能]</strong>[工具+证书+国际化]。每项可追溯到resume-data.js。</p>
+<p><strong>[P5 收尾]</strong>「[差异化标签，用×分隔三个关键词]」的复合背景较为符合贵司[岗位名]的要求，希望能和您进一步沟通～</p>
 </div>
 <button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('msg').innerText.replace(/\\n{2,}/g,'\\n'));this.textContent='已复制!'">复制话术到剪贴板</button>
 
 <h2>数据溯源</h2>
 <table class="trace-table">
 <tr><th>话术声称</th><th>resume-data.js 溯源</th><th>验证</th></tr>
-<tr><td>Python+CAT处理2W+语料</td><td>internships[0].achievements[0]</td><td class="good">✓</td></tr>
-<tr><td>OOC率降低85%</td><td>internships[2].achievements[0]</td><td class="good">✓</td></tr>
-<tr><td>百度翻译API评测管线</td><td>aiProjects[0].points[1]</td><td class="good">✓</td></tr>
-<tr><td>chrF++/BERTScore/COMET</td><td>aiProjects[0].points[1]</td><td class="good">✓</td></tr>
-<tr><td>TEM专八</td><td>skills[3]</td><td class="good">✓</td></tr>
+<tr><td>[P2的量化数据1]</td><td>internships[N].achievements[N]</td><td class="good">✓</td></tr>
+<tr><td>[P2的量化数据2]</td><td>internships[N].achievements[N]</td><td class="good">✓</td></tr>
+<tr><td>[P3的量化数据]</td><td>internships[N].achievements[N]</td><td class="good">✓</td></tr>
+<tr><td>[P4技能证据]</td><td>skills[N]</td><td class="good">✓</td></tr>
 </table>
 
 <h2>设计说明</h2>
 <ul style="font-size:9.5pt;color:var(--faded);">
-<li>选择...和...作为两段主推经历——与百度翻译JD的「API调用」「模型评估」「翻译技术」直接对应</li>
-<li>...经历未纳入——TOB销售运营与翻译产品关联度较低，避免分散HR注意力</li>
-<li>"翻译行业理解×技术实操×产品意识"差异化标签直接呼应评估报告的核心战略公式</li>
-<li>所有技能声称均可追溯到resume-data.js中的具体字段</li>
+<li>选择[经历A]和[经历B]作为主推——与[JD关键词1][JD关键词2]直接对应</li>
+<li>[经历C]放在项目段——[原因：场景与目标岗位关联度较低/作为辅助证据更合适]</li>
+<li>差异化标签"[三词标签]"拆解：[词1]（[证据]）→ [词2]（[证据]）→ [词3]（[证据]）</li>
+<li>所有技能声称可追溯到resume-data.js的具体字段（见上表），无证据的不写入话术</li>
 </ul>
 </body></html>
