@@ -18,6 +18,7 @@ A complete pipeline for AI-native resume management: convert raw resumes into st
 | `resume-data.js` | Structured resume data — the single edit target |
 | `script.js` | Rendering, avatar upload, PDF print, image capture, theme switch, A4 fit indicator |
 | `report-template.html` | Report base template for evaluation reports |
+| `self-intro-template.html` | Self-intro base template (5-paragraph, Charter/Georgia, ink/surface) |
 | `themes/default.css` | 经典海蓝: 海军蓝+暖白、宋体排版 |
 | `themes/scholar.css` | 简约黑白: serif 字体、实线标题分隔、空心圆点列表 |
 
@@ -350,7 +351,7 @@ This turns every job application into an asset. Next time the user targets the s
 
 ## Workflow 5: Self-Introduction Generation
 
-Generate a recruiter message (~240 Chinese characters / 5 paragraphs) for platforms like BOSS直聘, WeChat, LinkedIn. Output as an HTML file. Save to `self-intro.html`.
+Generate a recruiter message (~240 Chinese characters / 5 paragraphs) for platforms like BOSS直聘, WeChat, LinkedIn. **FIRST read `assets/template/self-intro-template.html` to understand the exact design.** Keep its CSS, layout, and structure exactly as-is — only replace placeholder content with real data. Save to `self-intro.html`.
 
 ### Layout
 
@@ -371,16 +372,6 @@ Generate a recruiter message (~240 Chinese characters / 5 paragraphs) for platfo
 **Data traceability table:** Dark-header table (`background: var(--ink); color: #fff`) with 3 columns: 话术声称 | resume-data.js 溯源 | 验证 (✓). Every factual claim in the intro must have a row.
 
 **Design notes:** Bulleted list (4 items max) explaining: experience selection rationale, experience placement decisions, differentiator label decomposition, traceability guarantee.
-
-### Visual Design
-
-```
-Color scheme:  --ink: #141412; --faded: #4e4e4b; --surface: #eeede9; --critical: #b53126; --pass: #4a7055
-Typography:    Charter, Georgia, "Noto Serif CJK SC", serif; 10.5pt body; 14pt headings
-Layout:        Single column, max-width 180mm, 2rem padding
-Table:         Dark header row (ink background, white text), light bordered rows
-Print:         @media print hides copy button; white background
-```
 
 ### Rules
 - Select the 2 most JD-relevant internships for P2. Place the strongest one first with full detail.
