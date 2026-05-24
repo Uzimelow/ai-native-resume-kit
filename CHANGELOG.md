@@ -80,6 +80,29 @@
   - `resume-data-b2b-pm.js`（定制版简历：重排经历顺序+重写为 B端叙事+压缩 C端经历+动词-证据校验）
   - `self-intro.html`（260 字招呼话术，面向 B端产品实习生岗位）
 
+### 测试驱动修正 1：经历粒度规则
+
+- **问题**：测试中发现作业帮-PolyBuzz 3 个月的实习被压缩成 1 条 mega-achievement，显得"几个月只干了一件事"
+- **修复**：Data Editing Rules 中 achievements 数量从 2-3 改为 3-5，新增规则：每条 achievement 只覆盖一个独立工作活动，禁止把多项不相关工作塞进一条
+- **影响**：SKILL.md 的 Data Editing Rules 和所有涉及 achievements 的工作流同步生效
+
+### 测试驱动修正 2：输出目录规范
+
+- **问题**：测试输出目录同时存在 `resume-data.js`（原版）和 `resume-data-b2b-pm.js`（定制版），用户困惑哪个是最终版
+- **修复**：Template Isolation 新增第 4 条——每个 output 目录只有一份 `resume-data.js`（当前版本）。定制时覆盖原文件，除非用户要求备份。明确定义 3 个交付物：index.html / jd-match-report.html / self-intro.html
+- **影响**：所有输出目录结构统一
+
+### 测试驱动修正 3：打招呼话术模块升级
+
+- **问题**：self-intro 只有纯文本卡片，缺目标岗位标注、缺数据溯源、缺设计说明——用户拿到后无法自检也无法理解为什么这样写
+- **修复**：SKILL.md 工作流 5 新增 4 个必出模块：
+  1. Header + 目标岗位 banner（岗位名、字数、段落数）
+  2. 5 段式话术（P2 核心经历 60% 篇幅、P3 辅助经历 30% 篇幅）
+  3. 数据溯源表（每条声明→resume-data.js 字段→证据强度）
+  4. 设计说明（结构逻辑、篇幅分配、个性化设计理由）
+- **设计风格**：与简历主题统一（navy+暖白+宋体），role banner 深色渐变
+- **影响**：self-intro 从纯文本输出升级为带自检功能的完整交付物
+
 ---
 
 ## 设计决策原则

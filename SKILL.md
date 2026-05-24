@@ -68,6 +68,7 @@ Every output workflow MUST:
 1. Create a new directory under `assets/`, named after role or task (e.g., `assets/baidu-ai-pm/`, `assets/evaluation-20260521/`)
 2. Copy the entire `assets/template/` into it — include `index.html`, `resume-data.js`, `script.js`, `themes/`. Do NOT copy `report-template.html` (it's the AI's tool, not a user deliverable)
 3. All edits, reports, and exports go into that directory
+4. Each output directory contains exactly **one** `resume-data.js` — the current version. Template files (`index.html`, `script.js`, `themes/`) are for rendering and never renamed. Deliverables: `index.html` (resume preview), `jd-match-report.html` (evaluation), `self-intro.html` (recruiter message). If tailoring produces a new version, overwrite `resume-data.js` (keep the original as `resume-data-previous.js` only if the user asks for a backup).
 
 ## Workflow 1: Resume HTMLization
 
@@ -349,19 +350,42 @@ This turns every job application into an asset. Next time the user targets the s
 
 ## Workflow 5: Self-Introduction Generation
 
-Generate a concise recruiter message (~180-280 Chinese characters) for platforms like WeChat, LinkedIn, BOSS直聘.
+Generate a recruiter message for platforms like WeChat, LinkedIn, BOSS直聘. Output as a self-contained HTML file with the same design language as the resume themes. Save to `self-intro.html`.
 
-**Template:**
+### Required Modules
 
-| Section | Content |
-|---------|---------|
-| Opening | 招聘老师您好！我叫[Name]，现就读于[Education] |
-| Internship 1 | 在实习方面，我曾在[Company]负责[Role]，[achievements relevant to JD] |
-| Internship 2 | 此外，我在[Company]负责[Role]，[key achievements] |
-| Skills | 在技术能力上，我能熟练应用[tools]，具备[capability] |
-| Closing | 个人认为我"[differentiator]"的复合背景较为符合贵司[Position]的要求，希望能和您进一步沟通～ |
+The output HTML MUST include these 4 modules:
 
-**Rules:** Select 2 most JD-relevant internships. Extract 1-2 achievement highlights each. List specific tools with evidence ("SQL用于数据提取", not "会SQL"). Differentiator is a concise composite label ("翻译+AI产品运营"). Use "您" (formal), end with "～". Every claim must be traceable to `resume-data.js`. Save to `self-intro.html`.
+**1. Header:** Title + target role banner showing: 目标岗位, 字数 (~180-280), 段落数 (5).
+
+**2. Five-paragraph text:**
+
+| # | Section | Content |
+|---|---------|---------|
+| P1 | Opening | 招聘老师您好！我叫[Name]，现就读于[Education]，意向贵司[Position]岗位 |
+| P2 | Core experience (60% weight) | 最 JD-relevant 的实习，2-3 条 achievement highlights，数据前置 |
+| P3 | Auxiliary experiences (30% weight) | 另外 2 段实习各一句，覆盖 JD 的第二、第三维度 |
+| P4 | Skills | 具体工具 + 证据 + 国际化能力，每项可被 resume-data.js 追溯 |
+| P5 | Closing | 差异化标签 + 岗位呼应，用"～"收尾 |
+
+**3. Data traceability table（数据溯源表）：** A table mapping every factual claim in the intro text to the exact field in `resume-data.js` that proves it (e.g., "internships[0].achievements[0]"). Each row rated for evidence strength (强证据/中度证据/需补充). Purpose: the user can verify every claim before sending, and prepare for interview follow-up questions.
+
+**4. Design notes（设计说明）：** A section explaining the structural decisions: (a) 5-paragraph rationale, (b) 2:1:1 weight allocation for experiences, (c) personalized closer design, (d) character count justification for platform compatibility. Written as instructional commentary, not marketing copy.
+
+### Visual Design
+
+- Share the same design vocabulary as the resume themes: navy (#1f347d) + warm-white + Songti/Serif typography
+- Role banner: dark gradient background (#172151 → #243986) with white text
+- The intro text card: clean white card with subtle border and shadow
+- Copy-to-clipboard button with feedback animation
+- Print CSS for PDF export via browser
+
+### Rules
+- Select 2-3 most JD-relevant internships. P2 gets the strongest one with full detail. P3 gets the other two, compressed to one line each.
+- Extract 2-3 achievement highlights for the core experience.
+- List specific tools with evidence ("SQL用于数据提取", not "会SQL").
+- Differentiator is a concise 3-part composite label ("B端产品设计+AI应用+英语国际化").
+- Use "您" (formal), end with "～". Every claim must be traceable to `resume-data.js`.
 
 > After self-intro: offer to export final PDF or PNG for the user's outreach flow.
 
@@ -418,8 +442,8 @@ window.resumeData = {
 ```
 
 Guidelines:
-- Each internship: `company`, `role`, `period` + 2-3 achievements (`label` + `text`)
-- Achievement label: short tag. Achievement text: one sentence with context + action + result.
+- Each internship: `company`, `role`, `period` + 3-5 achievements (`label` + `text`). **Each achievement covers one distinct work activity.** If a single achievement spans multiple unrelated activities (e.g., data analysis + SOP writing + team coordination), split into separate achievements. This makes the work look substantial — 3 months of internship should not look like 1 bullet point.
+- Achievement label: short tag (one activity). Achievement text: one sentence with context + action + result. Avoid cramming multiple independent actions into one achievement.
 - Projects: 2 points each — "项目背景" (context) + "关键产出" (outputs).
 - Skills: 3-5 items, each with label and descriptive text.
 
