@@ -273,6 +273,8 @@ Combine evaluation + polishing to create a JD-targeted resume. Four paths:
 | 15% | Evidence strength | strong=1.0, moderate=0.6, weak=0.3 |
 | 20% | AI semantic judgment | LLM rates the entry's relevance to this specific JD on 0.0-1.0. Return score + one-line Chinese rationale. |
 
+**Rewrite history boost:** Before ranking, check each entry's `rewrites[]` array. If an entry has a previous rewrite targeting the same role model → add 0.10 to the composite score (capped at 1.0). Mark such entries with a 「复用」badge in the presentation table — the AI can reuse that rewrite as a starting point.
+
 **4. Rank and present:**
 
 Sort by composite score descending. Filter out scores < 0.3. Deduplicate: if same source company appears twice, keep only the highest-scored entry.
@@ -307,6 +309,21 @@ JD: [公司名-岗位名] | 识别模型: [模型名] ([维度1]+[维度2]+[维�
 - `usage.timesUsed += 1`
 - `usage.lastUsed = today`
 - Append JD role to `usage.usedInRoles`
+
+**9. Auto-save rewrite (累积改写):** After the user confirms the final `resume-data.js`, save each selected entry's tailored achievements back to its `rewrites[]` array in the library:
+
+```json
+{
+  "id": "rw-001",                    // unique rewrite ID
+  "targetRole": "AI产品运营",        // role model from JD
+  "targetJD": "百度-AI产品实习生",   // company + position
+  "date": "2026-05-24",
+  "outputDir": "assets/baidu-ai-pm/",
+  "achievements": [...]              // the tailored version of achievements
+}
+```
+
+This turns every job application into an asset. Next time the user targets the same role model, Path D will find the matching rewrite and the AI only needs to tweak it rather than rewrite from scratch. The original `content` is never overwritten — it remains the source of truth for new role types.
 
 ### Steps (Paths A/B/C — after path selection):
 

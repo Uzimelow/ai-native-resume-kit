@@ -88,6 +88,10 @@ window.materialLibrary = {
         usedInRoles: []
       },
 
+      // 累积改写：每次 Path D 定制完成后自动存回
+      // 下次投相同岗位模型时优先复用，微调即可
+      rewrites: [],
+
       notes: "最有JD适配弹性的经历，含SQL+PRD+跨团队协同证据。可面向内容运营、数据运营、AI产品运营三种角色改写。"
     },
 
@@ -137,6 +141,8 @@ window.materialLibrary = {
         lastUsed:    null,
         usedInRoles: []
       },
+
+      rewrites: [],
 
       notes: "营销/快消方向核心证据。投非营销岗时可压缩为1条achievement，突出用户洞察和数据分析部分。"
     },
@@ -188,6 +194,8 @@ window.materialLibrary = {
         usedInRoles: []
       },
 
+      rewrites: [],
+
       notes: "AI岗核心证据。LLM预审+PRD+SOP+数据标注闭环，也适合策略运营岗。ownership标注为'推动'而非'主导'，因PRD为初稿且标注SOP是设计而非全链路owner。"
     },
 
@@ -230,6 +238,8 @@ window.materialLibrary = {
         lastUsed:    null,
         usedInRoles: []
       },
+
+      rewrites: [],
 
       notes: "技术含量较高的项目，role为核心成员而非独立owner。适合数据运营、策略产品岗。投非数据岗时可压缩或砍掉。"
     },
@@ -274,6 +284,8 @@ window.materialLibrary = {
         lastUsed:    null,
         usedInRoles: []
       },
+
+      rewrites: [],
 
       notes: "AI产品/运营方向核心证据。role为负责人但ownership标注为'推动'因为项目范围不明确。适合AI产品、AI运营、内容策略岗。"
     }
