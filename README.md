@@ -2,7 +2,7 @@
 
 > 把 PDF / DOCX 简历转换成 AI 可编辑、可预览、可导出 A4 PDF 的 HTML 简历，并支持根据 JD 定制、评估匹配度、润色优化、生成打招呼话术。
 
-在线 Demo：[简历模板](https://uzimelow.github.io/ai-native-resume-kit/assets/template/index.html) · [评估报告](https://uzimelow.github.io/ai-native-resume-kit/assets/template/report-template.html)
+在线 Demo：[简历模板](https://uzimelow.github.io/ai-native-resume-kit/assets/template/index.html) · [评估报告](https://uzimelow.github.io/ai-native-resume-kit/assets/template/report-template.html) · [招呼话术](https://uzimelow.github.io/ai-native-resume-kit/assets/template/self-intro-template.html)
 
 ---
 
