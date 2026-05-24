@@ -350,42 +350,35 @@ This turns every job application into an asset. Next time the user targets the s
 
 ## Workflow 5: Self-Introduction Generation
 
-Generate a recruiter message for platforms like WeChat, LinkedIn, BOSS直聘. Output as a self-contained HTML file with the same design language as the resume themes. Save to `self-intro.html`.
+Generate a recruiter message (~150 Chinese characters) for platforms like WeChat, LinkedIn, BOSS直聘. Output as a compact single-page HTML file. Save to `self-intro.html`.
 
-### Required Modules
+### Layout (single-page, no scroll)
 
-The output HTML MUST include these 4 modules:
+**Header bar:** Title "打招呼话术" + meta (目标岗位, 字数). Navy bottom border.
 
-**1. Header:** Title + target role banner showing: 目标岗位, 字数 (~180-280), 段落数 (5).
+**Three-paragraph text card:**
 
-**2. Five-paragraph text:**
+| # | Weight | Content |
+|---|--------|---------|
+| P1 | 15% | 姓名 + 学校 + 意向岗位 — one line |
+| P2 | 60% | 核心经历（最 JD-relevant 的实习，2-3 条 achievement） + 辅助经历（另外 2 段各一个数据点）— merged into one dense paragraph |
+| P3 | 25% | 技能 + 差异化标签 ("B端产品设计+AI应用+英语国际化") + "～" closing |
 
-| # | Section | Content |
-|---|---------|---------|
-| P1 | Opening | 招聘老师您好！我叫[Name]，现就读于[Education]，意向贵司[Position]岗位 |
-| P2 | Core experience (60% weight) | 最 JD-relevant 的实习，2-3 条 achievement highlights，数据前置 |
-| P3 | Auxiliary experiences (30% weight) | 另外 2 段实习各一句，覆盖 JD 的第二、第三维度 |
-| P4 | Skills | 具体工具 + 证据 + 国际化能力，每项可被 resume-data.js 追溯 |
-| P5 | Closing | 差异化标签 + 岗位呼应，用"～"收尾 |
-
-**3. Data traceability table（数据溯源表）：** A table mapping every factual claim in the intro text to the exact field in `resume-data.js` that proves it (e.g., "internships[0].achievements[0]"). Each row rated for evidence strength (强证据/中度证据/需补充). Purpose: the user can verify every claim before sending, and prepare for interview follow-up questions.
-
-**4. Design notes（设计说明）：** A section explaining the structural decisions: (a) 5-paragraph rationale, (b) 2:1:1 weight allocation for experiences, (c) personalized closer design, (d) character count justification for platform compatibility. Written as instructional commentary, not marketing copy.
+**Two-column footer (side-by-side, stacks on mobile):**
+- Left: Data traceability table — compact, each row maps a claim → `resume-data.js` field → evidence strength badge
+- Right: Design notes — 3 bullets: structure rationale, weight allocation, character-count justification
 
 ### Visual Design
-
-- Share the same design vocabulary as the resume themes: navy (#1f347d) + warm-white + Songti/Serif typography
-- Role banner: dark gradient background (#172151 → #243986) with white text
-- The intro text card: clean white card with subtle border and shadow
-- Copy-to-clipboard button with feedback animation
-- Print CSS for PDF export via browser
+- Same design vocabulary as resume themes: navy (#1f347d), warm-white, Songti
+- Compact density: everything visible without scrolling on a laptop screen
+- Copy-to-clipboard button between text card and footer
+- Print CSS for PDF export
 
 ### Rules
-- Select 2-3 most JD-relevant internships. P2 gets the strongest one with full detail. P3 gets the other two, compressed to one line each.
-- Extract 2-3 achievement highlights for the core experience.
-- List specific tools with evidence ("SQL用于数据提取", not "会SQL").
-- Differentiator is a concise 3-part composite label ("B端产品设计+AI应用+英语国际化").
-- Use "您" (formal), end with "～". Every claim must be traceable to `resume-data.js`.
+- Select 2 most JD-relevant internships for P2, compress others to one data point.
+- List specific tools with evidence ("SQL for data analysis", not "会SQL").
+- Differentiator: 3-part composite label. Use "您" (formal), end with "～".
+- ~150 chars — fit one message on BOSS直聘. Every claim traceable to `resume-data.js`.
 
 > After self-intro: offer to export final PDF or PNG for the user's outreach flow.
 
@@ -442,8 +435,8 @@ window.resumeData = {
 ```
 
 Guidelines:
-- Each internship: `company`, `role`, `period` + 3-5 achievements (`label` + `text`). **Each achievement covers one distinct work activity.** If a single achievement spans multiple unrelated activities (e.g., data analysis + SOP writing + team coordination), split into separate achievements. This makes the work look substantial — 3 months of internship should not look like 1 bullet point.
-- Achievement label: short tag (one activity). Achievement text: one sentence with context + action + result. Avoid cramming multiple independent actions into one achievement.
+- Each internship: `company`, `role`, `period` + 2-3 achievements (`label` + `text`). Each achievement covers one work activity. Do NOT compress unrelated activities into a single mega-achievement — if the text spans 3+ distinct actions, split into separate achievements. A 3-month internship should never appear as 1 bullet point.
+- Achievement label: short tag. Achievement text: one sentence with context + action + result.
 - Projects: 2 points each — "项目背景" (context) + "关键产出" (outputs).
 - Skills: 3-5 items, each with label and descriptive text.
 

@@ -31,6 +31,7 @@ body {
 	flex-direction: column;
 	gap: 1.5rem;
 	padding: 1.5rem;
+	font-size: 1rem;
 	color: var(--white);
 	background: linear-gradient(145deg, #172151, #243986);
 	border: 1px solid rgba(255, 255, 255, 0.14);
