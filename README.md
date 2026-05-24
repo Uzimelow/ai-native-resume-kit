@@ -9,6 +9,7 @@
 ## 它能做什么
 
 - **简历 HTML 化** — PDF / DOCX → 结构化 HTML，内容集中在 `resume-data.js`，AI 一键修改
+- **素材库模式** — 所有经历存入带能力标签的素材库，新 JD 自动匹配选取，一段经历反复复用
 - **JD 匹配评估** — 六维 JD 解析 + 岗位能力模型 + 证据矩阵，产出带批判性诊断的评估报告
 - **简历润色** — STAR 结构重写 + 量化数据补全，每段经历可审核可追溯
 - **JD 定制** — 基于评估结果重排经历顺序、强化匹配关键词、压缩弱相关内容，生成定制版简历
@@ -45,21 +46,25 @@
 ├── ai-native-resume-kit.skill   # 打包的 Skill 文件
 ├── SKILL.md                     # Skill 完整说明（工作流细节）
 ├── references/
-│   └── role-competency-library.md  # 岗位能力模型库
-└── assets/
-    └── template/
-        ├── index.html            # A4 简历页面 + 控制面板
-        ├── resume-data.js        # 结构化简历数据（唯一编辑目标）
-        ├── script.js             # 渲染、上传、导出、主题切换
-        ├── report-template.html  # 评估报告模板
-        └── themes/
-            ├── default.css       # 经典海蓝
-            └── scholar.css       # 简约黑白
+│   └── role-competency-library.md  # 岗位能力模型库（36 类）
+├── material-library/
+│   └── library-data.js          # 素材库 — 带能力标签的经历数据
+├── assets/
+│   └── template/
+│       ├── index.html           # A4 简历页面 + 控制面板
+│       ├── resume-data.js       # 结构化简历数据
+│       ├── script.js            # 渲染、上传、导出、主题切换
+│       ├── report-template.html # 评估报告模板
+│       └── themes/
+│           ├── base.css         # 共享结构样式
+│           ├── default.css      # 经典海蓝
+│           └── scholar.css      # 简约黑白
 ```
 
-- `resume-data.js` — 你和 AI 只改这一个文件
+- `resume-data.js` — 单次简历的直接编辑目标
+- `library-data.js` — 长期素材库，经历打标签后可反复复用
 - `index.html` — 打开即预览，导出即投递
-- `SKILL.md` — 完整工作流文档（HTML 化 / 评估 / 润色 / 定制 / 话术 / 导出）
+- `SKILL.md` — 完整工作流文档（HTML 化 / 入库 / 评估 / 润色 / 定制 / 素材库匹配 / 话术 / 导出）
 
 ---
 

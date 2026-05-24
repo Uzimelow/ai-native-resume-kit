@@ -8,7 +8,7 @@ allowed-tools: Read Write Bash Edit Grep Glob WebFetch
 
 ## Overview
 
-A complete pipeline for AI-native resume management: convert raw resumes into structured HTML, evaluate match against job descriptions, polish content for impact, fill the A4 template, generate recruiter messages, and export to PDF or image — all from a single self-contained HTML project.
+A complete pipeline for AI-native resume management: convert raw resumes into structured HTML, store experiences in a taggable material library for reuse, evaluate match against job descriptions, match JD requirements against library entries, polish content for impact, fill the A4 template, generate recruiter messages, and export to PDF or image — all from a single self-contained HTML project.
 
 ### Template (`assets/template/` — READ-ONLY)
 
@@ -35,10 +35,13 @@ A complete pipeline for AI-native resume management: convert raw resumes into st
 | User says | Workflow |
 |---|---|
 | "把这份PDF简历HTML化" / "convert my resume to HTML" | Resume HTMLization |
+| "存入素材库" / "入库" / "save to library" | Save to Material Library |
 | "评估简历匹配度" / "evaluate my resume" | Resume Evaluation |
 | "帮我润色简历" / "polish my resume" | Resume Polishing |
 | "根据JD定制简历" / "tailor for this role" | JD Tailoring |
+| "从素材库定制" / "素材库匹配" / "tailor from library" | JD Tailoring → Path D |
 | "生成打招呼话术" / "write a self-intro" | Self-Introduction |
+| "查看素材库" / "管理素材库" / "manage library" | Material Library Management |
 | "导出PDF" / "保存图片" / "export" | Export |
 
 ## Template Isolation (ALL workflows)
@@ -64,6 +67,40 @@ Convert a raw PDF/DOCX resume into the AI-native HTML format.
 8. Open in browser for preview when possible.
 9. Run the A4 fit loop until the page is well-filled.
 10. Export A4 PDF when requested.
+
+## Workflow: Save to Material Library (素材入库)
+
+Store all experiences from a `resume-data.js` into the persistent material library with AI-generated capability tags. Triggered explicitly or offered after every HTMLization.
+
+**Prerequisites:** `resume-data.js` must exist (from HTMLization or existing output directory).
+
+1. Read the source `resume-data.js`.
+2. Check if `material-library/library-data.js` exists:
+   - If not, initialize it using the template from `material-library/library-data.js` in this repo (preserve the `window.materialLibrary = { ... }` wrapper and all field structure). Copy `profile.basics` and `profile.education` from the source.
+   - If it exists, read it into memory.
+3. For each internship in `resume-data.js`:
+   a. Check for duplicate: same `company + role + period` triplet. If found, ask user: skip or overwrite.
+   b. Read `references/role-competency-library.md`. Based on the achievement text, assign capability tags as `{ role: "岗位模型", dimension: "具体维度" }` pairs. Only tag what the experience genuinely demonstrates.
+   c. Assign `industry`, `roleLevel`, and `ownership` tags. `ownership` must match the actual verb level in the source (实习生 defaults to "推动").
+   d. Assess evidence: `strength` (strong/moderate/weak), `hasQuantifiedData`, `keyMetrics` (concise summary string).
+   e. Write `notes` with adaptability advice: which roles this entry can be reframed for, cautions about ownership level.
+   f. Assign a unique `id` (exp-NNN for internships, proj-NNN for projects, incrementing from existing max).
+   g. Initialize `usage` to `{ timesUsed: 0, lastUsed: null, usedInRoles: [] }`.
+4. For each project: same process as step 3 (type = "project", content uses `points` not `achievements`).
+5. For each skill:
+   a. Check for duplicate by `label`. If found, ask: skip or overwrite.
+   b. Determine `proficiency` (精通/熟练/掌握/了解) based on the skill text.
+   c. Cross-reference with library experiences: which experience IDs prove this skill? Fill `evidenceRefs`.
+   d. Assign capability tags if the skill maps to specific dimensions.
+6. Update `meta.lastModified`.
+7. Write `material-library/library-data.js`. Validate JS syntax before delivering.
+8. Report: "已入库 N 条实习经历, M 条项目经历, K 条技能。"
+
+**Tag assignment rules:**
+- Only tag dimensions that the experience text actually supports. A single achievement can demonstrate multiple dimensions.
+- Use the exact dimension names from `tagDictionary` in `library-data.js`.
+- If the source role is not in tagDictionary, use the closest match and note it.
+- `ownership` must be traceable to the source text — never upgrade "参与" to "主导".
 
 ## Workflow 2: Resume Evaluation
 
@@ -184,7 +221,7 @@ Improve existing resume content. Edit `resume-data.js` only — in an output cop
 
 ## Workflow 4: JD Tailoring
 
-Combine evaluation + polishing to create a JD-targeted resume. Three paths:
+Combine evaluation + polishing to create a JD-targeted resume. Four paths:
 
 **Path A — 已有评估报告:** Load existing `jd-match-report.html` Part 2 as basis. Skip evaluation.
 
@@ -192,9 +229,62 @@ Combine evaluation + polishing to create a JD-targeted resume. Three paths:
 
 **Path C — 完整套件 (默认):** Run full Evaluation first → produce `jd-match-report.html` → proceed.
 
+**Path D — 从素材库定制:** Match JD against `material-library/library-data.js`, select top experiences, then tailor. (Triggers when library exists AND user says "从素材库定制"/"素材库匹配", OR when library exists and user is tailoring for the first time — suggest Path D.)
+
 *If user provides PDF/DOCX, run HTMLization first, then enter the chosen path.*
 
-### Steps (after path selection):
+### Path D — Material Library Matching & Tailoring
+
+**1. Load library:** Read `material-library/library-data.js`. If fewer than 2 experiences, warn: "素材库条目不足（<2条），建议先入库更多经历，或使用路径 B/C。"
+
+**2. JD 解析:** Same 6-dimension framework as Evaluation + role model lookup from `references/role-competency-library.md`.
+
+**3. Matching algorithm — for each library experience, compute a composite score:**
+
+| Weight | Factor | How to compute |
+|--------|--------|----------------|
+| 40% | Capability tag overlap | Count tags where `{role, dimension}` matches JD role model dimensions. Score = matched / total required. |
+| 15% | Industry match | Overlap between `entry.tags.industry` and JD's business context. Cap at 1.0. |
+| 10% | Level match | Distance-based: intern→intern=1.0, intern→junior=0.7, intern→mid=0.3, intern→senior=0. Larger gap = lower score. |
+| 15% | Evidence strength | strong=1.0, moderate=0.6, weak=0.3 |
+| 20% | AI semantic judgment | LLM rates the entry's relevance to this specific JD on 0.0-1.0. Return score + one-line Chinese rationale. |
+
+**4. Rank and present:**
+
+Sort by composite score descending. Filter out scores < 0.3. Deduplicate: if same source company appears twice, keep only the highest-scored entry.
+
+Present as a scored table:
+
+```
+### 素材库匹配结果
+
+JD: [公司名-岗位名] | 识别模型: [模型名] ([维度1]+[维度2]+[维度3]+[维度4])
+
+| # | 经历 | 匹配度 | 关键标签 | 匹配理由 |
+|---|------|--------|----------|----------|
+| 1 | exp-001 某头部互联网-产品运营 | 0.87 | 标签4/4, 互联网 | 能力全覆盖，强证据 |
+| 2 | exp-003 某AI初创-AI产品 | 0.72 | 标签3/4, AI | 数据质量+合规相关 |
+| ... | ... | ... | ... | ... |
+
+建议选择前2-3项。exp-002可压缩为1条或跳过。
+```
+
+**5. User confirmation:** Accept / reorder / exclude entries. User must explicitly approve before proceeding.
+
+**6. Assemble resume-data.js:**
+- `basics` + `education` from `library.profile`
+- `internships` from selected entries of type="internship"
+- `projects` from selected entries of type="project"
+- `skills` from `library.skills`, filtered to those with `evidenceRefs` pointing to selected experiences (plus language skill which always stays)
+
+**7. Tailor:** Re-enter standard tailoring flow — Preview before apply (show every change with source label), rewrite achievements for JD keyword alignment, self-audit, validate JS + A4 fit.
+
+**8. Update usage tracking:** After successful tailoring, for each used library entry:
+- `usage.timesUsed += 1`
+- `usage.lastUsed = today`
+- Append JD role to `usage.usedInRoles`
+
+### Steps (Paths A/B/C — after path selection):
 
 1. Create output directory from `assets/template/`.
 2. Draft ALL changes as a preview (do NOT write yet):
@@ -225,6 +315,38 @@ Generate a concise recruiter message (~180-280 Chinese characters) for platforms
 | Closing | 个人认为我"[differentiator]"的复合背景较为符合贵司[Position]的要求，希望能和您进一步沟通～ |
 
 **Rules:** Select 2 most JD-relevant internships. Extract 1-2 achievement highlights each. List specific tools with evidence ("SQL用于数据提取", not "会SQL"). Differentiator is a concise composite label ("翻译+AI产品运营"). Use "您" (formal), end with "～". Every claim must be traceable to `resume-data.js`. Save to `self-intro.html`.
+
+## Workflow: Material Library Management (素材库管理)
+
+Manage the persistent material library. All commands read/write `material-library/library-data.js`. Always validate JS syntax after any write.
+
+| User says | Action |
+|-----------|--------|
+| "查看素材库" / "素材库有什么" / "library list" | List all entries compactly: ID, source name, type, top 3 capability tags, usage count, evidence strength. Use a table. |
+| "查看 exp-XXX" | Show full detail of one entry: all fields, all tags, usage history, notes. |
+| "添加经历" / "add to library" | Guided interactive: ask for company/role/period/achievements → auto-tag using role-competency-library.md → preview tags for user confirmation → append to library. |
+| "删除 exp-XXX" / "remove" | Confirm with user, then remove entry by ID. Also remove its ID from any `skills[].evidenceRefs`. |
+| "编辑 exp-XXX 标签" / "update tags" | Show current tags → accept changes → write back. |
+| "素材库统计" / "library stats" | Show: total entries, entries per type, most-used entries, tag coverage matrix (which capability dimensions have evidence → which are gaps), last modified date. Cross-reference tag coverage against the user's primary roles' dimensions in `tagDictionary`. |
+| "重新打标签" / "retag all" | Re-run AI tagging (step 3 of Save to Material Library) on every entry. Useful after `role-competency-library.md` updates. Preserve `usage` history. |
+
+**Tag coverage matrix example:**
+
+```
+能力维度覆盖矩阵（针对 primaryRoles: 产品运营, AI产品运营）
+
+产品运营:
+  ✅ 数据驱动     — exp-001, sk-002
+  ✅ 策略执行力   — exp-001, proj-002
+  ✅ 效果验证力   — exp-001
+  ✅ 效率优化力   — exp-001, exp-003, proj-001
+
+AI产品运营:
+  ✅ 模型理解力   — exp-003, proj-002, sk-003
+  ✅ 数据质量力   — exp-003, proj-002
+  ✅ 合规风控力   — exp-003
+  ⚠️ 产品运营基础 — 覆盖不足（仅间接证据）
+```
 
 ## Data Editing Rules
 
@@ -292,10 +414,11 @@ Enemy-mode addendum: every flaw MUST cite specific evidence (or lack thereof). I
 
 | Completed | Suggest |
 |:---|:---|
-| HTML 化 | "如果你有目标岗位 JD，我可以做匹配度评估。" |
-| 评估 | "要我直接根据这份评估定制一版简历吗？" |
+| HTML 化 | "简历已 HTML 化。要存入素材库吗？如果你有目标岗位 JD，我可以做匹配度评估。" |
+| 入库 | "素材库已更新。有目标岗位 JD 的话我可以从素材库匹配定制。" |
+| 评估 | "要我直接根据这份评估定制一版简历吗？（如果素材库有数据，也可以试试从素材库匹配）" |
 | 润色 | "有具体 JD 的话我可以进一步定制。" |
 | 话术 | "需要我帮你导出最终版 PDF 吗？" |
 | JD 定制 / 导出 | "还有其他岗位需要定制吗？" |
 
-If user provides JD + resume but only asks for one workflow, deliver what they asked for first, then suggest the next step. If user says "全套", execute sequentially — pause at each Preview step for confirmation.
+If user provides JD + resume but only asks for one workflow, deliver what they asked for first, then suggest the next step. If user says "全套", execute sequentially — pause at each Preview step for confirmation. If `material-library/library-data.js` exists, proactively suggest Path D when the user mentions JD tailoring.
