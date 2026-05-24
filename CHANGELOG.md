@@ -114,6 +114,12 @@
 - **修复**：压缩至 ~100 词。策略：(1) 删除所有 "Do NOT trigger" 例外——改为加强正向触发信号覆盖边界；(2) 新增素材库相关触发词（入库/从素材库匹配）；(3) 中文触发词前置，侵略性触发（TRIGGER whenever...even in passing）；(4) 核心功能编号压缩为一行
 - **影响**：提升 skill 被触发的准确率，减少 AI 因描述过长而忽略 skill 的概率
 
+### 收尾：重打包 + 最终审查
+
+- **重打包** `.skill` 文件（53K → 69K）：新增 base.css、material-library/（10 个文件）、README、CHANGELOG、.gitignore；删除旧引用 library-data.js、candidate-material-library.md
+- **README 修正**：仓库结构图中旧 `library-data.js` 引用更新为新的多文件结构
+- **.gitignore 更新**：新增 test/、workspace/、eval_set.json
+
 ---
 
 ## 设计决策原则
