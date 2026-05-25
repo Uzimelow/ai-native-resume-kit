@@ -366,6 +366,7 @@ button:disabled:hover {
 	}
 
 	.resume-page {
+		overflow: visible;
 		border: none;
 		border-radius: 0;
 		box-shadow: none;

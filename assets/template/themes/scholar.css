@@ -304,7 +304,7 @@ body {
 /* ---- Print overrides ---- */
 @media print {
 	.resume-page {
-		overflow: hidden;
+		overflow: visible;
 	}
 
 	.portrait {
