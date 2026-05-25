@@ -5,8 +5,14 @@
 /* ---- Reset ---- */
 * {
 	box-sizing: border-box;
-	-webkit-print-color-adjust: exact;
-	print-color-adjust: exact;
+}
+
+/* Print color: exact on screen, economy in print (avoids Chrome rasterizing text as bitmap) */
+@media screen {
+	* {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+	}
 }
 
 /* ---- Shell ---- */

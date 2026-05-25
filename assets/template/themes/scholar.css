@@ -307,10 +307,6 @@ body {
 		overflow: hidden;
 	}
 
-	.section-title::after {
-		display: none;
-	}
-
 	.portrait {
 		background: black;
 	}
