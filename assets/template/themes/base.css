@@ -372,6 +372,12 @@ button:disabled:hover {
 		box-shadow: none;
 	}
 
+	/* kill pseudo-elements entirely — display:none is not enough to prevent Chrome rasterization */
+	.resume-page::before,
+	.section-title::before {
+		content: none;
+	}
+
 	.portrait {
 		box-shadow: none;
 	}
