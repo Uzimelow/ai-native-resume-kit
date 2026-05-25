@@ -67,9 +67,9 @@ If none of the above apply, ask the user what they want to do. Suggest the three
 
 Every output workflow MUST:
 1. Create a new directory under `assets/`, named after role or task (e.g., `assets/baidu-ai-pm/`, `assets/evaluation-20260521/`)
-2. Copy the entire `assets/template/` into it — include `index.html`, `resume-data.js`, `script.js`, `themes/`. Do NOT copy `report-template.html` (it's the AI's tool, not a user deliverable)
+2. Copy ONLY these files from `assets/template/` into the output directory: `index.html`, `resume-data.js`, `script.js`, `themes/`. Do NOT copy `report-template.html` or `self-intro-template.html` — those are AI tool files, not rendering dependencies. The output directory must contain exactly: `index.html` + `resume-data.js` + `script.js` + `themes/` + generated reports. No extra template files.
 3. All edits, reports, and exports go into that directory
-4. Each output directory contains exactly **one** `resume-data.js` — the current version. Template files (`index.html`, `script.js`, `themes/`) are for rendering and never renamed. Deliverables: `index.html` (resume preview), `jd-match-report.html` (evaluation), `self-intro.html` (recruiter message). If tailoring produces a new version, overwrite `resume-data.js` (keep the original as `resume-data-previous.js` only if the user asks for a backup).
+4. Each output directory contains exactly **one** `resume-data.js` — the current version. Deliverables: `index.html` (resume preview), `jd-match-report.html` (evaluation), `self-intro.html` (recruiter message). If tailoring produces a new version, overwrite `resume-data.js` (only keep a backup if the user asks).
 
 ## Workflow 1: Resume HTMLization
 
@@ -436,7 +436,7 @@ window.resumeData = {
 ```
 
 Guidelines:
-- Each internship: `company`, `role`, `period` + 2-3 achievements (`label` + `text`). Each achievement covers one work activity. Do NOT compress unrelated activities into a single mega-achievement — if the text spans 3+ distinct actions, split into separate achievements. A 3-month internship should never appear as 1 bullet point.
+- Each internship: `company`, `role`, `period` + **at least 2** achievements (2-3 total). Never let an internship appear with only 1 achievement — it makes months of work look like a single task. If compressing for space, compress the text length, not the achievement count. Each achievement covers one work activity; split mega-achievements that span multiple unrelated actions.
 - Achievement label: short tag. Achievement text: one sentence with context + action + result.
 - Projects: 2 points each — "项目背景" (context) + "关键产出" (outputs).
 - Skills: 3-5 items, each with label and descriptive text.
