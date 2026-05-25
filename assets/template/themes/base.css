@@ -177,7 +177,7 @@ button:disabled:hover {
 /* ---- A4 Page Shell ---- */
 .resume-page {
 	position: relative;
-	overflow: clip;
+	overflow: hidden;
 	width: 210mm;
 	height: 297mm;
 	margin-inline: auto;
