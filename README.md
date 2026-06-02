@@ -30,6 +30,7 @@
 |---------|---------|
 | 第一次用，有 PDF 简历 + JD | > 「帮我把这份简历 HTML 化，再评估匹配度」 |
 | 想长期投多个岗位 | > 「把简历存入素材库，以后每次给我匹配 JD 就行」 |
+| 想手动查看/编辑素材库 | 浏览器打开 `material-library/library.html`，可视化编辑后直接保存 |
 | 已有 HTML 简历，只想改改 | > 「帮我润色这段实习经历」 |
 | 已有 HTML 简历 + 新 JD | > 「根据这个 JD 定制一版简历」 |
 | 只想看看模板长什么样 | 直接打开 [简历 Demo](https://uzimelow.github.io/ai-native-resume-kit/assets/template/index.html) · [报告 Demo](https://uzimelow.github.io/ai-native-resume-kit/assets/template/report-template.html) |
