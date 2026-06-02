@@ -1,0 +1,256 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>素材库编辑器 — Material Library</title><style>
+:root{--navy:#1f347d;--blue:#3857c6;--gold:#b88935;--ink:#1c2030;--paper:#faf8f4;--faded:#5f6474;--line:#d7d0c2;--mist:#e9edf8;--white:#fffdf7;--pass:#4a7055;--warn:#b86824}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;font-size:14px;line-height:1.5;color:var(--ink);background:#f2eee3;min-height:100vh}
+.toolbar{display:flex;align-items:center;gap:1rem;padding:0.8rem 1.5rem;background:linear-gradient(145deg,#172151,#243986);color:#fff;position:sticky;top:0;z-index:100}
+.toolbar h1{font-size:1.1rem;font-weight:700;letter-spacing:0.02em}
+.toolbar .spacer{flex:1}
+.toolbar button{padding:0.4rem 1rem;border:1px solid rgba(255,255,255,0.3);border-radius:0.3rem;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;font-size:0.82rem;font-weight:600}
+.toolbar button:hover{background:rgba(255,255,255,0.2)}
+.toolbar button.primary{background:var(--gold);border-color:var(--gold)}
+.toolbar button.primary:hover{background:#c9953e}
+#save-status{font-size:0.75rem;opacity:0.7}
+.layout{display:flex;min-height:calc(100vh - 48px)}
+.sidebar{width:200px;background:var(--paper);border-right:1px solid var(--line);padding:1rem 0;flex-shrink:0}
+.sidebar .cat{display:block;width:100%;padding:0.5rem 1.2rem;text-align:left;border:none;background:none;cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--faded);transition:background 120ms}
+.sidebar .cat:hover{background:var(--mist)}
+.sidebar .cat.active{color:var(--navy);background:var(--mist);border-right:3px solid var(--navy)}
+.main{flex:1;padding:1.5rem 2rem;overflow-y:auto;max-height:calc(100vh - 48px)}
+.stats{display:flex;gap:1.5rem;margin-bottom:1.5rem}
+.stat{background:var(--white);border:1px solid var(--line);border-radius:0.5rem;padding:0.8rem 1.2rem;min-width:100px}
+.stat .num{font-size:1.4rem;font-weight:800;color:var(--navy)}
+.stat .lbl{font-size:0.72rem;color:var(--faded);letter-spacing:0.04em;text-transform:uppercase}
+.cards{display:grid;gap:0.8rem}
+.card{background:var(--white);border:1px solid var(--line);border-radius:0.5rem;overflow:hidden;transition:box-shadow 120ms}
+.card:hover{box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.card-header{display:flex;justify-content:space-between;align-items:center;padding:0.7rem 1rem;cursor:pointer;user-select:none}
+.card-header:hover{background:var(--mist)}
+.card-header .title{font-weight:700;font-size:0.9rem}
+.card-header .meta{font-size:0.75rem;color:var(--faded)}
+.card-body{display:none;padding:0 1rem 1rem;border-top:1px solid var(--line)}
+.card.open .card-body{display:block}
+.card.open .card-header{background:var(--mist)}
+.ach-item{display:flex;gap:0.5rem;align-items:flex-start;margin-bottom:0.5rem;padding:0.5rem;background:var(--mist);border-radius:0.3rem}
+.ach-item .ach-label{font-weight:700;font-size:0.8rem;white-space:nowrap;min-width:80px}
+.ach-item .ach-text{font-size:0.82rem;color:var(--faded)}
+.tags-row{display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.4rem}
+.tag{font-size:0.68rem;padding:0.15rem 0.5rem;border-radius:2mm;font-weight:600;white-space:nowrap}
+.tag.cap{background:rgba(31,52,125,0.1);color:var(--navy)}
+.tag.ind{background:rgba(184,137,53,0.12);color:var(--gold)}
+.tag.lvl{background:rgba(74,112,85,0.1);color:var(--pass)}
+.tag.own{background:rgba(184,104,36,0.1);color:var(--warn)}
+.tag.used{background:rgba(74,112,85,0.08);color:var(--pass)}
+.tag.unused{color:var(--faded);background:rgba(95,100,116,0.08)}
+.evidence-bar{font-size:0.72rem;color:var(--faded);margin-top:0.3rem}
+.evidence-bar .s{color:var(--pass);font-weight:700}
+.empty-state{text-align:center;padding:3rem;color:var(--faded)}
+fieldset{border:1px solid var(--line);border-radius:0.5rem;padding:0.8rem 1rem;margin-top:0.5rem}
+fieldset legend{font-weight:700;font-size:0.82rem;padding:0 0.4rem}
+.form-row{display:flex;gap:0.5rem;align-items:center;margin-bottom:0.4rem}
+.form-row label{font-size:0.78rem;color:var(--faded);min-width:60px}
+.form-row input,.form-row textarea,.form-row select{flex:1;padding:0.35rem 0.5rem;border:1px solid var(--line);border-radius:0.25rem;font:inherit;font-size:0.82rem}
+.form-row textarea{height:60px;resize:vertical}
+.add-btn{padding:0.4rem 1rem;border:none;border-radius:0.3rem;background:var(--navy);color:#fff;cursor:pointer;font-size:0.8rem;font-weight:600;margin-top:0.5rem}
+.add-btn:hover{background:var(--blue)}
+.skill-row{display:flex;gap:0.5rem;align-items:baseline;padding:0.5rem;background:var(--mist);border-radius:0.3rem;margin-bottom:0.5rem}
+.skill-row .sk-label{font-weight:700;font-size:0.82rem;min-width:60px}
+.skill-row .sk-text{font-size:0.78rem;color:var(--faded);flex:1}
+.skill-row .sk-pro{font-size:0.72rem;color:var(--pass);font-weight:600;white-space:nowrap}
+.rewrite-entry{font-size:0.72rem;padding:0.3rem 0.6rem;margin:0.2rem 0;background:rgba(74,112,85,0.06);border-radius:0.25rem}
+.rewrite-entry .rw-date{color:var(--faded)}
+.rewrite-entry .rw-role{color:var(--navy);font-weight:600}
+.hidden{display:none}
+@media(max-width:720px){.sidebar{width:120px}.main{padding:1rem}.stats{flex-wrap:wrap}}
+</style></head><body>
+
+<div class="toolbar">
+<h1>素材库编辑器</h1>
+<span class="spacer"></span>
+<span id="save-status"></span>
+<button onclick="saveLibrary()" class="primary" title="通过 File System Access API 直接写入文件">保存到文件</button>
+</div>
+
+<div class="layout">
+<div class="sidebar" id="sidebar"></div>
+<div class="main" id="main"></div>
+</div>
+
+<script id="library-data" type="application/json">
+// ── 素材库完整数据 ──
+// 数据结构：
+//   meta           — 版本、候选⼈信息
+//   profile        — 不变的 basics + education
+//   experiences[]  — 所有经历（实习+项目），每条带 capability/industry 标签、证据评估、使用追踪、累积改写
+//   skills[]       — 技能清单，带 proficiency + evidenceRefs
+//   tagDictionary  — 所有可用标签（从 role-competency-library.md 提取）
+//   categoryIndex  — 大类索引（用于侧边栏导航）
+
+{"meta":{"version":"1.0","lastModified":"2026-05-25","lastModifiedBy":"AI","candidateName":"李小明","primaryIndustries":["互联网","AI","快消"],"targetLevel":"intern"},"profile":{"basics":{"name":"李小明","intent":"求职意向：产品运营实习生","location":"上海","undergraduate":"复旦大学 新闻学院 传播学","graduate":"上海交通大学 媒体与传播学院 新闻与传播","graduationYear":"2026","email":"lixiaoming@example.com","phone":"13900001111"},"education":[{"degree":"硕士","school":"上海交通大学","college":"媒体与传播学院","major":"新闻与传播","period":"2024.09-2026.06"},{"degree":"本科","school":"复旦大学","college":"新闻学院","major":"传播学","period":"2020.09-2024.06"}]},"experiences":[{"id":"exp-001","type":"internship","source":{"company":"某头部互联网公司-内容生态部","role":"产品运营实习生","period":"2025.06-2025.09"},"content":{"achievements":[{"label":"内容供给策略优化","text":"负责短视频内容池的供给侧分析，通过SQL提取6个月消费与互动数据（样本量50W+条），识别出低互动率且高曝光的「高曝低效」内容类型4类，输出供给质量分析报告并推动汰换机制上线。优质内容曝光占比从31%提升至38%，人均消费时长从12.4min提升至14.6min，日均低质内容曝光量下降约40W次。"},{"label":"创作者激励体系搭建","text":"主导创作者激励体系的产品化设计：分析10W+创作者行为数据，按投稿频次与互动表现划分为4个等级，设计对应成长任务（新手引导→进阶挑战→高阶权益）与阶梯式流量激励。输出PRD初稿并协同研发、运营、设计团队推动上线，周活跃创作者数从8,200提升至11,100，头部创作者月流失率从18%降至6%。"},{"label":"产品工具搭建与体验优化","text":"针对SKU认知门槛高、推荐不准的业务卡点，0-1搭建内容产品导航平台，实现「内容类型×用户分层」交叉定位与一键跳转。单次运营决策时长降低30min，上线当周核心业务线渗透率达60%，人均周检索7次，信息查找效率提升显著。"}]},"tags":{"capability":[{"role":"产品运营","dimension":"数据驱动"},{"role":"产品运营","dimension":"策略执行力"},{"role":"产品运营","dimension":"效率优化力"},{"role":"产品运营","dimension":"效果验证力"},{"role":"AI产品运营","dimension":"数据质量力"}],"industry":["互联网","内容平台"],"roleLevel":"intern","ownership":"推动"},"evidence":{"strength":"strong","hasQuantifiedData":true,"keyMetrics":"50W+样本量, 31%→38%曝光占比, 12.4→14.6min, 40W次低质曝光下降"},"usage":{"timesUsed":0,"lastUsed":null,"usedInRoles":[]},"rewrites":[],"notes":"最有JD适配弹性的经历，含SQL+PRD+跨团队协同证据。可面向内容运营、数据运营、AI产品运营三种角色改写。"},{"id":"exp-002","type":"internship","source":{"company":"某快消品牌-市场部","role":"品牌营销实习生","period":"2025.02-2025.05"},"content":{"achievements":[{"label":"新品上市推广与用户增长","text":"负责新品上市的用户增长与内容触达策略：基于目标客群画像设计社交媒体种草内容矩阵，筛选50+垂类KOL并按粉丝画像分层投放，最终触达用户超500万，新品首月销售额超额20%达成目标。"},{"label":"用户洞察与竞品分析","text":"开展消费者深度访谈与问卷调研（N=200+），结合电商评论挖掘与竞品动态追踪，定位消费者核心决策因子，输出品类机会报告，驱动产品卖点提炼与包装优化，新品上市后复购率提升15个百分点。"}]},"tags":{"capability":[{"role":"市场营销","dimension":"用户洞察力"},{"role":"市场营销","dimension":"渠道策略力"},{"role":"市场营销","dimension":"内容创意力"},{"role":"市场营销","dimension":"ROI验证力"}],"industry":["快消"],"roleLevel":"intern","ownership":"推动"},"evidence":{"strength":"strong","hasQuantifiedData":true,"keyMetrics":"500W+触达, 超额20%, N=200+调研, 复购率+15%"},"usage":{"timesUsed":0,"lastUsed":null,"usedInRoles":[]},"rewrites":[],"notes":"营销/快消方向核心证据。投非营销岗时可压缩为1条achievement，突出用户洞察和数据分析部分。"},{"id":"exp-003","type":"internship","source":{"company":"某AI初创公司-产品部","role":"AI产品实习生","period":"2024.10-2025.01"},"content":{"achievements":[{"label":"AI内容审核工作流搭建","text":"发现审核团队日均处理量瓶颈（300条/人）导致审核时效不达标，分析工作流中可自动化环节，设计LLM预审方案并撰写PRD协调工程团队落地。人工审核量从300条/人降至120条/人，审核时效从4h缩短至1.5h，内容合规风险事件发生率降低80%。"},{"label":"数据标注体系与质量标准建设","text":"为解决AI模型训练数据质量不稳定的问题，设计涵盖基础体验（一致性、记忆力）与策略表现（合规度、准确度）等12维量化评分矩阵的标注SOP。标注结果二次加权Kappa系数达0.7，数据标注一致性提升40%，模型训练效果提升12%。"}]},"tags":{"capability":[{"role":"AI产品运营","dimension":"模型理解力"},{"role":"AI产品运营","dimension":"数据质量力"},{"role":"AI产品运营","dimension":"合规风控力"},{"role":"产品运营","dimension":"效率优化力"}],"industry":["AI","内容平台"],"roleLevel":"intern","ownership":"推动"},"evidence":{"strength":"strong","hasQuantifiedData":true,"keyMetrics":"300→120条/人, 4h→1.5h, 合规风险-80%, Kappa 0.7, 标注一致性+40%"},"usage":{"timesUsed":0,"lastUsed":null,"usedInRoles":[]},"rewrites":[],"notes":"AI岗核心证据。LLM预审+PRD+SOP+数据标注闭环，也适合策略运营岗。ownership标注为'推动'而非'主导'。"},{"id":"proj-001","type":"project","source":{"title":"短视频热点预测模型","role":"核心成员","period":"2025.07-2025.09"},"content":{"points":["项目背景：内容运营团队在热点选题上高度依赖人工经验判断，选题成功率仅35%，且响应速度落后竞品2-3小时，导致流量流失。","关键产出：（1）构建基于历史爆款内容的12维特征指标体系，结合时序分析预测热点趋势，选题命中率从35%提升至49%；（2）搭建自动化热点监控看板，实现分钟级异动预警，响应速度缩短至30min以内。"]},"tags":{"capability":[{"role":"产品运营","dimension":"数据驱动"},{"role":"产品运营","dimension":"效率优化力"},{"role":"策略产品经理","dimension":"策略设计力"}],"industry":["互联网","内容平台"],"roleLevel":"intern","ownership":"推动"},"evidence":{"strength":"moderate","hasQuantifiedData":true,"keyMetrics":"35%→49%命中率, 响应30min以内, 12维特征体系"},"usage":{"timesUsed":0,"lastUsed":null,"usedInRoles":[]},"rewrites":[],"notes":"技术含量较高的项目，role为核心成员而非独立owner。适合数据运营、策略产品岗。投非数据岗时可压缩或砍掉。"},{"id":"proj-002","type":"project","source":{"title":"AI 产品内容生态优化项目","role":"负责人","period":"2025.10-2025.12"},"content":{"points":["项目背景：AI对话产品在多场景下内容生成质量不稳定，用户投诉率高，且缺乏系统性的效果评估机制。","关键产出：（1）搭建多语言平行语料库与自动化评估管线，实现内容质量的分钟级监控；（2）设计3类递进式Prompt约束规则，通过人工测评迭代3版Prompt，内容OOC率降低85%，用户对话续写率提升30%。"]},"tags":{"capability":[{"role":"AI产品经理","dimension":"模型理解力"},{"role":"AI产品经理","dimension":"效果评估力"},{"role":"AI产品运营","dimension":"数据质量力"},{"role":"产品运营","dimension":"策略执行力"}],"industry":["AI","内容平台"],"roleLevel":"intern","ownership":"推动"},"evidence":{"strength":"moderate","hasQuantifiedData":true,"keyMetrics":"OOC率-85%, 续写率+30%, 3版Prompt迭代, 多语言评估管线"},"usage":{"timesUsed":0,"lastUsed":null,"usedInRoles":[]},"rewrites":[],"notes":"AI产品/运营方向核心证据。适合AI产品、AI运营、内容策略岗。"}],"skills":[{"id":"sk-001","label":"产品技能","category":"运营大类","proficiency":"熟练","evidenceRefs":["exp-001","exp-003"],"text":"熟练使用Axure、墨刀进行原型设计，具备PRD撰写与需求管理经验；熟悉Scrum开发流程与跨团队项目协同；掌握用户访谈、问卷调研、可用性测试等用户研究方法。","tags":{"capability":[{"role":"产品运营","dimension":"策略执行力"},{"role":"产品运营","dimension":"效率优化力"}]}},{"id":"sk-002","label":"数据技能","category":"运营大类","proficiency":"熟练","evidenceRefs":["exp-001"],"text":"熟练使用SQL进行日常数据提取与分析；精通Excel数据透视表与可视化；具备Python基础编程与自动化脚本编写能力；熟悉神策、GrowingIO等数据分析平台。","tags":{"capability":[{"role":"产品运营","dimension":"数据驱动"},{"role":"数据分析","dimension":"取数处理力"}]}},{"id":"sk-003","label":"AI工具","category":"运营大类","proficiency":"掌握","evidenceRefs":["exp-003","proj-002"],"text":"熟悉LLM应用与Prompt工程，有AI辅助内容审核与内容生成质量评估的实践经验；掌握Claude Code、Coze等AI开发工具的基础使用。","tags":{"capability":[{"role":"AI产品经理","dimension":"模型理解力"},{"role":"AI产品运营","dimension":"模型理解力"}]}},{"id":"sk-004","label":"语言能力","category":"_universal","proficiency":"熟练","evidenceRefs":[],"text":"CET-4、CET-6；英语读写流利，可独立完成英文文档撰写与跨文化业务沟通；具备中英双语内容策划与编辑能力。","tags":{"capability":[]}}],"tagDictionary":{"产品运营":{"dimensions":["数据驱动","策略执行力","效果验证力","效率优化力"]},"用户运营":{"dimensions":["用户洞察力","分层触达力","留存策略力","数据验证力"]},"内容运营":{"dimensions":["内容策略力","供应链管理力","质量把控力","消费效果力"]},"活动运营":{"dimensions":["创意策划力","执行落地力","资源协调力","效果复盘力"]},"商家运营":{"dimensions":["招募策略力","培育赋能力","分层管理力","GMV驱动力"]},"电商运营":{"dimensions":["货品策略力","流量获取力","转化优化力","复购留存力"]},"AI产品运营":{"dimensions":["产品运营基础","模型理解力","数据质量力","合规风控力"]},"增长运营":{"dimensions":["增长模型力","渠道实验力","转化优化力","规模化力"]},"商业化运营":{"dimensions":["变现策略力","定价优化力","付费转化力","收入驱动力"]},"策略运营":{"dimensions":["规则设计力","数据建模力","策略调优力","效果验证力"]},"新媒体运营":{"dimensions":["内容创作力","平台理解力","粉丝增长力","流量转化力"]},"渠道运营":{"dimensions":["渠道拓展力","投放优化力","商务谈判力","ROI分析力"]},"社群运营":{"dimensions":["社群搭建力","活跃维护力","用户粘性力","私域转化力"]},"数据运营":{"dimensions":["指标体系力","分析洞察力","策略建议力","业务联动力"]},"生态运营":{"dimensions":["平台治理力","资源整合力","生态合作力","规则设计力"]},"C端产品经理":{"dimensions":["用户洞察力","体验设计力","AB验证力","数据驱动力"]},"B端产品经理":{"dimensions":["业务理解力","效率设计力","权限模型力","客户落地力"]},"商业化产品经理":{"dimensions":["变现设计力","定价策略力","广告系统力","收入驱动力"]},"AI产品经理":{"dimensions":["模型理解力","能力定义力","体验设计力","效果评估力"]},"策略产品经理":{"dimensions":["算法理解力","策略设计力","效果实验力","系统优化力"]},"数据产品经理":{"dimensions":["业务理解力","数据基建力","工具设计力","效率提升力"]},"渠道拓展":{"dimensions":["渠道策略力","商务开拓力","合作关系力","增长贡献力"]},"市场推广":{"dimensions":["品牌策略力","整合传播力","内容营销力","效果衡量力"]},"商务合作":{"dimensions":["合作策略力","谈判执行力","资源整合力","价值创造力"]},"架构师":{"dimensions":["系统设计力","技术选型力","性能优化力","技术治理力"]},"前端工程师":{"dimensions":["技术深度力","工程化能力","用户体验力","业务价值力"]},"后端工程师":{"dimensions":["技术深度力","系统可靠性力","数据设计力","业务支撑力"]},"移动端工程师":{"dimensions":["平台能力力","性能优化力","用户体验力","工程效率力"]},"测试工程师":{"dimensions":["质量体系建设力","自动化能力","风险防控力","效率提升力"]},"运维工程师":{"dimensions":["基础架构力","稳定性保障力","自动化能力","成本优化力"]},"数据分析":{"dimensions":["问题定义力","取数处理力","分析洞察力","业务影响力"]},"商业分析":{"dimensions":["行业研究力","商业建模力","战略建议力","决策推动力"]},"战略分析":{"dimensions":["战略思维力","系统性研究力","高层视野力","长期价值力"]},"市场营销":{"dimensions":["用户洞察力","渠道策略力","内容创意力","ROI验证力"]},"产品设计":{"dimensions":["用户研究力","交互设计力","视觉产出力","落地验证力"]},"人力资源":{"dimensions":["招聘交付力","员工关系力","组织建设力","数据运营力"]},"industry":["互联网","AI","内容平台","快消","电商","教育","医疗","汽车","金融","企业服务","游戏"],"ownership":["主导","参与","协助","支持","推动","协同","落地","负责"],"roleLevel":["intern","junior","mid","senior","lead"]},"categoryIndex":{"运营大类":{"models":["产品运营","用户运营","内容运营","活动运营","商家运营","电商运营","AI产品运营","增长运营","商业化运营","策略运营","新媒体运营","渠道运营","社群运营","数据运营","生态运营"],"entries":["exp-001","exp-003","proj-001","proj-002"]},"营销大类":{"models":["市场营销"],"entries":["exp-002"]},"产品大类":{"models":["C端产品经理","B端产品经理","商业化产品经理","AI产品经理","策略产品经理","数据产品经理"],"entries":[]},"市场大类":{"models":["渠道拓展","市场推广","商务合作"],"entries":[]},"技术大类":{"models":["架构师","前端工程师","后端工程师","移动端工程师","测试工程师","运维工程师"],"entries":[]},"分析大类":{"models":["数据分析","商业分析","战略分析"],"entries":[]},"设计大类":{"models":["产品设计"],"entries":[]},"人力大类":{"models":["人力资源"],"entries":[]}}}
+</script>
+
+<script>
+// ═══════════════════════════════════════
+// 编辑器主逻辑
+// ═══════════════════════════════════════
+
+const LIB = (function(){
+  try{return JSON.parse(document.getElementById('library-data').textContent.trim())}
+  catch(e){return null}
+})();
+
+if(!LIB){document.getElementById('main').innerHTML='<div class="empty-state"><h3>数据解析失败</h3><p>请检查 library-data 脚本块中的 JSON 是否有效。</p></div>';throw new Error("Library data parse failed")}
+
+const ALL_CATS = Object.keys(LIB.categoryIndex);
+let activeCategory = '运营大类';
+
+function catEntries(cat){return (LIB.categoryIndex[cat]||{}).entries||[]}
+function catModels(cat){return (LIB.categoryIndex[cat]||{}).models||[]}
+function expById(id){return LIB.experiences.find(function(e){return e.id===id})}
+function skillById(id){return LIB.skills.find(function(s){return s.id===id})}
+
+function renderSidebar(){
+  var html='';
+  ALL_CATS.forEach(function(c){
+    var count=catEntries(c).length;
+    html+='<button class="cat'+(c===activeCategory?' active':'')+'" onclick="switchCategory(\''+c+'\')">'+c+' <span style="font-size:0.7rem;opacity:0.6">'+count+'</span></button>';
+  });
+  document.getElementById('sidebar').innerHTML=html;
+}
+
+function switchCategory(cat){
+  activeCategory=cat;
+  renderSidebar();
+  renderMain();
+}
+
+function renderStats(){
+  var total=LIB.experiences.length;
+  var interns=LIB.experiences.filter(function(e){return e.type==='internship'}).length;
+  var projects=LIB.experiences.filter(function(e){return e.type==='project'}).length;
+  var used=LIB.experiences.filter(function(e){return e.usage.timesUsed>0}).length;
+  return '<div class="stats">'+
+    '<div class="stat"><div class="num">'+total+'</div><div class="lbl">总经历</div></div>'+
+    '<div class="stat"><div class="num">'+interns+'</div><div class="lbl">实习</div></div>'+
+    '<div class="stat"><div class="num">'+projects+'</div><div class="lbl">项目</div></div>'+
+    '<div class="stat"><div class="num">'+used+'</div><div class="lbl">已使用</div></div>'+
+    '<div class="stat"><div class="num">'+LIB.skills.length+'</div><div class="lbl">技能</div></div>'+
+  '</div>';
+}
+
+function renderExperience(entry){
+  var usage=entry.usage;
+  var usedLabel=usage.timesUsed>0?'<span class="tag used">已使用 '+usage.timesUsed+' 次</span>':'<span class="tag unused">未使用</span>';
+  var hasQuant=entry.evidence&&entry.evidence.hasQuantifiedData?' · <span class="s">有量化数据</span>':'';
+  var keyMetrics=entry.evidence&&entry.evidence.keyMetrics?'<div>关键指标：'+entry.evidence.keyMetrics+'</div>':'';
+
+  var achHtml='';
+  if(entry.type==='project'){
+    achHtml=(entry.content.points||[]).map(function(p,i){return '<div class="ach-item"><span class="ach-label">Point '+(i+1)+'</span><span class="ach-text">'+escHtml(p)+'</span></div>'}).join('');
+  }else{
+    achHtml=(entry.content.achievements||[]).map(function(a){
+      return '<div class="ach-item"><span class="ach-label">'+escHtml(a.label)+'</span><span class="ach-text">'+escHtml(a.text)+'</span></div>';
+    }).join('');
+  }
+
+  var tagsHtml='';
+  (entry.tags.capability||[]).forEach(function(t){
+    tagsHtml+='<span class="tag cap">'+escHtml(t.role)+' · '+escHtml(t.dimension)+'</span>';
+  });
+  (entry.tags.industry||[]).forEach(function(i){tagsHtml+='<span class="tag ind">'+escHtml(i)+'</span>'});
+  tagsHtml+='<span class="tag lvl">'+escHtml(entry.tags.roleLevel||'')+'</span>';
+  tagsHtml+='<span class="tag own">'+escHtml(entry.tags.ownership||'')+'</span>';
+
+  var rewritesHtml='';
+  if(entry.rewrites&&entry.rewrites.length){
+    rewritesHtml='<fieldset style="margin-top:0.8rem"><legend>累积改写 ('+entry.rewrites.length+')</legend>';
+    entry.rewrites.forEach(function(r){
+      rewritesHtml+='<div class="rewrite-entry"><span class="rw-date">'+r.date+'</span> · <span class="rw-role">'+escHtml(r.targetRole||'')+'</span> — '+escHtml(r.targetJD||'')+'</div>';
+    });
+    rewritesHtml+='</fieldset>';
+  }
+
+  return '<div class="card" id="card-'+entry.id+'">'+
+    '<div class="card-header" onclick="toggleCard(\''+entry.id+'\')">'+
+      '<span><span class="title">'+escHtml(entry.source.company||entry.source.title)+'</span> · <span style="color:var(--faded);font-size:0.82rem">'+escHtml(entry.source.role||entry.source.title||'')+'</span></span>'+
+      '<span class="meta">'+escHtml(entry.source.period||'')+' · '+usedLabel+'</span>'+
+    '</div>'+
+    '<div class="card-body">'+
+      '<div><strong>ID:</strong> '+entry.id+' · <strong>类型:</strong> '+(entry.type==='project'?'项目':'实习')+' · <strong>证据强度:</strong> '+(entry.evidence?entry.evidence.strength:'')+hasQuant+'</div>'+
+      keyMetrics+
+      '<div style="margin-top:0.4rem">'+achHtml+'</div>'+
+      '<div class="tags-row">'+tagsHtml+'</div>'+
+      (entry.notes?'<div style="margin-top:0.4rem;font-size:0.78rem;color:var(--faded)">📝 '+escHtml(entry.notes)+'</div>':'')+
+      rewritesHtml+
+    '</div>'+
+  '</div>';
+}
+
+function renderSkills(){
+  var html='<h3 style="margin:1rem 0 0.5rem;font-size:0.95rem">专业技能</h3>';
+  LIB.skills.forEach(function(s){
+    var refs=(s.evidenceRefs||[]).join(', ');
+    html+='<div class="skill-row"><span class="sk-label">'+escHtml(s.label)+'</span><span class="sk-text">'+escHtml(s.text)+'</span><span class="sk-pro">'+escHtml(s.proficiency)+'</span></div>';
+    html+='<div style="font-size:0.7rem;color:var(--faded);margin:-0.2rem 0 0.3rem 68px">证据引用：'+(refs||'无')+' · 归属：'+escHtml(s.category||'')+'</div>';
+  });
+  return html;
+}
+
+function renderMain(){
+  var ids=catEntries(activeCategory);
+  var entries=ids.map(expById).filter(Boolean);
+  var html=renderStats();
+  html+='<div class="cards">';
+  entries.forEach(function(e){html+=renderExperience(e)});
+  html+='</div>';
+  if(entries.length===0)html+='<div class="empty-state"><h3>'+activeCategory+' 为空</h3><p>该大类暂无经历。通过 AI 入库或手动添加来填充。</p></div>';
+  html+=renderSkills();
+  document.getElementById('main').innerHTML=html;
+}
+
+function toggleCard(id){
+  var card=document.getElementById('card-'+id);
+  if(card)card.classList.toggle('open');
+}
+
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ═══════════════════════════════════════
+// 保存逻辑 — File System Access API
+// ═══════════════════════════════════════
+
+async function saveLibrary(){
+  var status=document.getElementById('save-status');
+  // Serialize updated data back to JSON
+  var dataEl=document.getElementById('library-data');
+  var updated=JSON.stringify(LIB,null,2);
+  var fullHtml=document.documentElement.outerHTML.replace(
+    /(<script[^>]*id="library-data"[^>]*>)[\s\S]*?(<\/script>)/,
+    '$1\n'+updated+'\n$2'
+  );
+  status.textContent='正在保存...';
+
+  try{
+    // Try File System Access API
+    var handle=await window.showOpenFilePicker({types:[{description:'HTML files',accept:{'text/html':['.html']}}],multiple:false});
+    var fileHandle=handle[0];
+    var writable=await fileHandle.createWritable();
+    await writable.write(fullHtml);
+    await writable.close();
+    status.textContent='已保存 ✓';
+    setTimeout(function(){status.textContent=''},3000);
+  }catch(e){
+    if(e.name==='AbortError'){
+      // User cancelled file picker — fall back to download
+      var blob=new Blob([fullHtml],{type:'text/html'});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');a.href=url;a.download='library.html';
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      status.textContent='已下载 ✓ （浏览器不支持直接写入，请替换原文件）';
+    }else{
+      status.textContent='保存失败：'+e.message;
+    }
+  }
+}
+</script>
+</body></html>

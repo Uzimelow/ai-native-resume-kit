@@ -39,7 +39,7 @@ When the user mentions their resume, apply these rules in order to determine the
 1. User says "从素材库定制" / "素材库匹配" → **Path D** (library matching)
 2. User says "存入素材库" / "入库" → **Save to Material Library**
 3. User says "评估" / "诊断" + JD present → **Resume Evaluation**
-4. `material-library/_profile.js` exists AND user asks for JD tailoring but didn't specify a path → **suggest Path D**, fall back to Path B/C if user declines
+4. `material-library/library.html` exists AND user asks for JD tailoring but didn't specify a path → **suggest Path D**, fall back to Path B/C if user declines
 5. User uploads PDF/DOCX for the first time → **HTMLization first**, then suggest: (a) save to library, or (b) evaluate match if JD is also present
 6. User has existing resume-data.js but no library → suggest **Save to Material Library** after any edit
 7. User says "润色" / "polish" → **Resume Polishing**
@@ -96,27 +96,18 @@ Store all experiences from a `resume-data.js` into the persistent material libra
 **Prerequisites:** `resume-data.js` must exist (from HTMLization or existing output directory).
 
 1. Read the source `resume-data.js`.
-2. Check if `material-library/_profile.js` exists:
-   - If not, initialize from template (`material-library/_profile.js`). Fill `basics` and `education` from the source.
-   - If exists, read it.
-3. For each internship and project, assign AI tags (same as before: read role-competency-library.md, assign capability/industry/roleLevel/ownership tags, assess evidence, write notes, assign ID, init usage and rewrites: []). Also determine the **primary category** for each entry: look at the dominant capability tag's role, then find which category it belongs to by checking `tagDictionary`'s comment headers (e.g., `// ---- 运营大类 ----`).
-4. **Write category files:** Group entries by primary category. For each category, create or update `material-library/<category>.js` using the format:
-
-```js
-window.materialLibrary_<category> = {
-  category: "<category>", version: "1.0", lastModified: "<date>",
-  experiences: [ /* entries for this category */ ],
-  crossRefs: { /* auto-generate if tags span multiple categories */ }
-};
-```
-5. If any entry has capability tags spanning multiple categories, auto-generate a `crossRefs` entry in its primary category file.
-6. For skills: write to `material-library/_profile.js` under `skills[]`. Mark skill's `category` as the primary category of its evidenceRefs, or `_universal` if none.
-7. Update `_profile.js`'s `categoryIndex` to reflect the new file structure and crossRefs. Update `meta.lastModified`.
-8. Validate JS syntax on all modified files.
-9. Report: "已入库 N 条经历到 [categories], M 条技能。"
+2. Check if `material-library/library.html` exists:
+   - If not, initialize from the repo template. Fill `profile.basics` and `profile.education` from the source.
+   - If exists, read the `<script id="library-data">` block and parse as JSON.
+3. For each internship and project, assign AI tags (read role-competency-library.md → capability/industry/roleLevel/ownership tags → assess evidence → write notes → assign ID → init usage and rewrites: [] → determine primary category).
+4. Append new entries to the `experiences[]` array in the parsed data. Update `categoryIndex` with the new entry IDs under the matching categories.
+5. For skills: append to `skills[]` in the parsed data. Mark `category` field.
+6. Serialize the updated object back into the `<script id="library-data">` block. Update `meta.lastModified`. Write the full `library.html` file.
+7. Validate the JSON in the script block is valid.
+8. Report: "已入库 N 条经历, M 条技能。"
 
 **Tag assignment rules:**
-- Use exact dimension names from `tagDictionary` in `_profile.js`.
+- Use exact dimension names from `tagDictionary` in the library data.
 - If source role not in tagDictionary, use closest match and note it.
 - `ownership` must be traceable to source — never upgrade "参与" to "主导".
 
@@ -264,18 +255,16 @@ Combine evaluation + polishing to create a JD-targeted resume. Four paths:
 
 **Path C — 完整套件 (默认):** Run full Evaluation first → produce `jd-match-report.html` → proceed.
 
-**Path D — 从素材库定制:** Match JD against `material-library/_profile.js`, select top experiences, then tailor. (Triggers when library exists AND user says "从素材库定制"/"素材库匹配", OR when library exists and user is tailoring for the first time — suggest Path D.)
+**Path D — 从素材库定制:** Match JD against `material-library/library.html`, select top experiences, then tailor. (Triggers when library exists AND user says "从素材库定制"/"素材库匹配", OR when library exists and user is tailoring for the first time — suggest Path D.)
 
 *If user provides PDF/DOCX, run HTMLization first, then enter the chosen path.*
 
 ### Path D — Material Library Matching & Tailoring
 
-**1. Load library — category-based:**
-   a. Read `material-library/_profile.js` to get `basics`, `education`, `skills`, `categoryIndex`, `tagDictionary`.
-   b. After JD role model is identified (Step 2), look up which category covers that model by checking `categoryIndex` — each category lists its `models`.
-   c. Load the corresponding category file (e.g., `material-library/运营大类.js`).
-   d. If that category has < 2 experiences AND `crossRefs` exist for another category → also load the cross-referenced category file and include those entries flagged as crossRef matches.
-   e. If combined experiences still < 2, warn: "素材库条目不足（<2条），建议先入库更多经历，或使用路径 B/C。" (Don't count crossRef entries toward this minimum — they're supplements, not primary.)
+**1. Load library:**
+   a. Read `material-library/library.html` — parse the `<script id="library-data">` block as JSON.
+   b. From the data, get `profile` (basics + education), `skills`, `categoryIndex`, `tagDictionary`, all `experiences[]`.
+   c. If `experiences.length < 2`, warn: "素材库条目不足（<2条），建议先入库更多经历，或使用路径 B/C。"
 
 **2. JD 解析:** Same 6-dimension framework as Evaluation + role model lookup from `references/role-competency-library.md`.
 
@@ -314,16 +303,15 @@ JD: [公司名-岗位名] | 识别模型: [模型名] ([维度1]+[维度2]+[维�
 **5. User confirmation:** Accept / reorder / exclude entries. User must explicitly approve before proceeding.
 
 **6. Assemble resume-data.js:**
-- `basics` + `education` from `_profile.js`
-- `internships` from selected entries of type="internship" (from category file)
-- `projects` from selected entries of type="project" (from category file)
-- `skills` from `_profile.js`, filtered to those with `evidenceRefs` pointing to selected experiences, plus any `_universal` skills (e.g., language)
+- `basics` + `education` from `library.profile`
+- `internships` / `projects` from selected library entries
+- `skills` from `library.skills`, filtered to those with `evidenceRefs` pointing to selected experiences, plus `_universal` skills
 
-**7. Tailor:** Re-enter standard tailoring flow — Preview before apply (show every change with source label), rewrite achievements for JD keyword alignment, self-audit, validate JS + A4 fit.
+**7. Tailor:** Re-enter standard tailoring flow — Preview before apply, rewrite achievements for JD keyword alignment, self-audit, validate JS + A4 fit.
 
-**8. Update usage tracking:** After successful tailoring, for each used entry in the category file → update `usage` fields. Also update `_profile.js`'s `meta.lastModified`.
+**8. Update usage tracking:** After successful tailoring, for each used entry → update `usage` fields. Update `meta.lastModified`. Serialize data back into `library.html`.
 
-**9. Auto-save rewrite (累积改写):** After user confirms the final `resume-data.js`, save each selected entry's tailored achievements back to its `rewrites[]` array **in its category file** (e.g., `material-library/运营大类.js`):
+**9. Auto-save rewrite (累积改写):** After user confirms the final `resume-data.js`, save each selected entry's tailored achievements to its `rewrites[]` array in the library data:
 
 ```json
 {
@@ -392,7 +380,7 @@ Generate a recruiter message (~240 Chinese characters / 5 paragraphs) for platfo
 
 ## Workflow: Material Library Management (素材库管理)
 
-Manage the persistent material library. Commands read `_profile.js` + category files as needed. Always validate JS syntax after any write. The multi-file structure: `_profile.js` (shared) + `<category>.js` (per-category experiences).
+Manage the persistent material library. Read `material-library/library.html` → parse `<script id="library-data">` block as JSON → operate on the data → serialize back. Always validate JSON before writing. All data lives in a single file.
 
 | User says | Action |
 |-----------|--------|
@@ -495,4 +483,4 @@ Enemy-mode addendum: every flaw MUST cite specific evidence (or lack thereof). I
 | 话术 | "需要我帮你导出最终版 PDF 吗？" |
 | JD 定制 / 导出 | "还有其他岗位需要定制吗？" |
 
-If user provides JD + resume but only asks for one workflow, deliver what they asked for first, then suggest the next step. If user says "全套", execute sequentially — pause at each Preview step for confirmation. If `material-library/_profile.js` exists, proactively suggest Path D when the user mentions JD tailoring.
+If user provides JD + resume but only asks for one workflow, deliver what they asked for first, then suggest the next step. If user says "全套", execute sequentially — pause at each Preview step for confirmation. If `material-library/library.html` exists, proactively suggest Path D when the user mentions JD tailoring.
