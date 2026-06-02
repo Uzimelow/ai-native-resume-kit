@@ -201,12 +201,24 @@ async function captureAndCopyImage(button) {
   button.disabled = true;
 
   try {
+    // Clip to first A4 page (210mm × 297mm)
+    const a4HeightPx = resume.getBoundingClientRect().width * (297 / 210);
+    const origOverflow = resume.style.overflow;
+    const origMaxHeight = resume.style.maxHeight;
+    resume.style.overflow = "hidden";
+    resume.style.maxHeight = a4HeightPx + "px";
+
     const canvas = await html2canvas(resume, {
       scale: 2,
       useCORS: true,
       allowTaint: true,
-      backgroundColor: "#ffffff"
+      backgroundColor: "#ffffff",
+      height: a4HeightPx,
+      windowHeight: a4HeightPx
     });
+
+    resume.style.overflow = origOverflow;
+    resume.style.maxHeight = origMaxHeight;
 
     const blob = await new Promise((resolve, reject) => {
       canvas.toBlob((b) => {
@@ -239,6 +251,16 @@ function updateA4FitIndicator() {
   const indicator = document.getElementById("a4-fit-indicator");
   if (!page || !indicator) return;
 
+  const a4HeightPx = (297 / 210) * page.getBoundingClientRect().width;
+  const actualHeight = page.scrollHeight;
+  const pages = Math.ceil(actualHeight / a4HeightPx);
+
+  if (pages > 1) {
+    indicator.textContent = "当前内容已超出 1 页 A4（约 " + pages + " 页），图像保存仅针对第 1 页";
+    indicator.className = "a4-fit-indicator fit-overflow";
+    return;
+  }
+
   const pageRect = page.getBoundingClientRect();
   const children = page.children;
   let maxBottom = 0;
@@ -251,10 +273,7 @@ function updateA4FitIndicator() {
   const ratio = 297 / pageRect.height;
   const mm = bottomPx * ratio;
 
-  if (mm < 3) {
-    indicator.textContent = "⚠ 内容溢出或过满";
-    indicator.className = "a4-fit-indicator fit-overflow";
-  } else if (mm < 8) {
+  if (mm < 8) {
     indicator.textContent = "● 偏满（" + Math.round(mm) + "mm 余白）";
     indicator.className = "a4-fit-indicator fit-tight";
   } else if (mm > 45) {

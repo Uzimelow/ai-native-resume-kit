@@ -174,12 +174,12 @@ button:disabled:hover {
 	background: var(--white);
 }
 
-/* ---- A4 Page Shell ---- */
+/* ---- A4 Page Shell — multi-page ready ---- */
 .resume-page {
 	position: relative;
-	overflow: hidden;
+	overflow: visible;
 	width: 210mm;
-	height: 297mm;
+	min-height: 297mm;
 	margin-inline: auto;
 	padding: 7mm 9mm 7mm;
 	background: var(--white);
@@ -297,12 +297,10 @@ button:disabled:hover {
 }
 
 .project-points {
-	margin: 1.1mm 0 0;
+	margin: 1.2mm 0 0;
+	display: grid;
+	gap: 0.9mm;
 	padding-left: 3.8mm;
-}
-
-.project-points li + li {
-	margin-top: 0.7mm;
 }
 
 /* ---- Responsive ---- */
@@ -366,7 +364,6 @@ button:disabled:hover {
 	}
 
 	.resume-page {
-		overflow: visible;
 		border: none;
 		border-radius: 0;
 		box-shadow: none;

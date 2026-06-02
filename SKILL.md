@@ -19,6 +19,7 @@ A complete pipeline for AI-native resume management: convert raw resumes into st
 | `script.js` | Rendering, avatar upload, PDF print, image capture, theme switch, A4 fit indicator |
 | `report-template.html` | Report base template for evaluation reports |
 | `self-intro-template.html` | Self-intro base template (5-paragraph, Charter/Georgia, ink/surface) |
+| `references/skill-taxonomy.md` | 技能分类与推断字典 — 用于拆分用户能力、推断相关技能、生成应用场景描述 |
 | `themes/default.css` | 经典海蓝: 海军蓝+暖白、宋体排版 |
 | `themes/scholar.css` | 简约黑白: serif 字体、实线标题分隔、空心圆点列表 |
 
@@ -115,10 +116,16 @@ window.materialLibrary_<category> = {
 9. Report: "已入库 N 条经历到 [categories], M 条技能。"
 
 **Tag assignment rules:**
-- Only tag dimensions the experience text actually supports.
 - Use exact dimension names from `tagDictionary` in `_profile.js`.
 - If source role not in tagDictionary, use closest match and note it.
 - `ownership` must be traceable to source — never upgrade "参与" to "主导".
+
+**Achievement-level dedup (achievement 级去重):** After tagging, for each new achievement within the SAME internship/project entry, check against existing achievements in that entry:
+- Compute capability tag overlap + key metric overlap as rough similarity (>80% tag overlap → flag for user review).
+- Purpose: ensure achievements within one experience are mutually exclusive (each covers a distinct work activity). Duplication across DIFFERENT experiences is allowed (e.g., "used SQL" in both 字节 and 作业帮 is fine — different contexts).
+- If flagged: present to user with options — replace existing / keep both / discard new.
+- If not flagged: auto-accept.
+- This check runs per-entry (internship/project), not globally across all entries.
 
 > After saving to library: remind user that future JD tailoring can now use Path D (library matching). Ask if they have a JD ready.
 
@@ -439,17 +446,15 @@ Guidelines:
 - Each internship: `company`, `role`, `period` + **at least 2** achievements (2-3 total). Never let an internship appear with only 1 achievement — it makes months of work look like a single task. If compressing for space, compress the text length, not the achievement count. Each achievement covers one work activity; split mega-achievements that span multiple unrelated actions.
 - Achievement label: short tag. Achievement text: one sentence with context + action + result.
 - Projects: 2 points each — "项目背景" (context) + "关键产出" (outputs).
-- Skills: 3-5 items, each with label and descriptive text.
+- Skills: 3-5 items, each with label and descriptive text. When writing skill descriptions, consult `references/skill-taxonomy.md` to: (a) split vague skills into capability → sub-capability pairs (e.g., "会AI工具" → "AI能力 > LLM工具 > Claude Code")；(b) infer related skills the user likely has and ask for confirmation；(c) enrich descriptions with specific application scenarios (e.g., "用于业务程序搭建与自动化工作流" instead of just "熟练使用Claude Code")。
 
-## A4 Fit Loop
+## A4 Fit
 
-The resume page is 210mm × 297mm. Content must fill exactly one page.
+The resume page is 210mm wide, min-height 297mm. Content flows naturally across multiple A4 pages when needed — no forced single-page constraint.
 
-**Targets:** Bottom whitespace 12px-45px. Internships are the largest visual block. Body text ≥ ~8pt.
+**A4 fit indicator (control panel):** The page calculates whether content fits within one A4 page. If content overflows, the indicator shows the estimated page count and a note that PNG capture only saves the first page.
 
-**Overflow priority:** (1) Shorten bullet text → (2) Reduce card padding & gaps → (3) Compress personal info → (4) Slightly reduce font size.
-
-**Underflow priority:** (1) Increase internship line-height & spacing → (2) Add one concise achievement → (3) Increase internship font size → (4) Do NOT expand personal info just to fill space.
+**Content density guideline (single-page goal):** Internships should be the largest visual block. Body text ≥ ~8pt. If content fits in one page, ensure bottom whitespace is 12-45mm. Do NOT expand personal info just to fill space.
 
 ## Export
 
@@ -457,8 +462,10 @@ Two export paths:
 
 | Method | Format | Use Case |
 |--------|--------|----------|
-| 打印 / 导出 PDF | Vector PDF, selectable text, clickable links | Formal submission |
-| 保存图片并复制 | 2x PNG to clipboard, flat image | Quick share via WeChat/chat |
+| 打印 / 导出 PDF | Vector PDF, multi-page A4, selectable text | Formal submission — browser handles pagination automatically |
+| 保存图片并复制 | 2x PNG of **first A4 page only**, flat image | Quick share via WeChat/chat — content beyond page 1 is not captured |
+
+> If the fit indicator shows multiple pages, remind the user: "当前内容已超出 1 页 A4，图像保存仅针对第 1 页。建议打印导出 PDF 获取完整多页版本。"
 
 PNG text is NOT selectable — not for formal submission.
 
