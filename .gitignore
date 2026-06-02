@@ -1,4 +1,5 @@
 .claude/
 test/
+test-*/
 workspace/
 eval_set.json
