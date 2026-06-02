@@ -99,24 +99,14 @@ Store all experiences from a `resume-data.js` into the persistent material libra
 2. Check if `material-library/library.html` exists:
    - If not, initialize from the repo template. Fill `profile.basics` and `profile.education` from the source.
    - If exists, read the `<script id="library-data">` block and parse as JSON.
-3. For each internship and project, assign AI tags (read role-competency-library.md → capability/industry/roleLevel/ownership tags → assess evidence → write notes → assign ID → init usage and rewrites: [] → determine primary category).
-4. Append new entries to the `experiences[]` array in the parsed data. Update `categoryIndex` with the new entry IDs under the matching categories.
-5. For skills: append to `skills[]` in the parsed data. Mark `category` field.
-6. Serialize the updated object back into the `<script id="library-data">` block. Update `meta.lastModified`. Write the full `library.html` file.
-7. Validate the JSON in the script block is valid.
-8. Report: "已入库 N 条经历, M 条技能。"
+3. For each internship and project, read `references/role-competency-library.md` to understand the target role's dimensions — this context helps the AI write richer achievement descriptions, but no formal tags are stored.
+4. Assign unique `id` (exp-NNN / proj-NNN). Append to `experiences[]`. Projects and internships share the unified `content.achievements[{label, text}]` format.
+5. For skills: read `references/skill-taxonomy.md`. Split each skill into `skillDimensions[{name, items[{name, proficiency, description}]]}`. Store in `skillDimensions[]`.
+6. Serialize the updated data back into `<script id="library-data">`. Update `meta.lastModified`. Write the full `library.html` file.
+7. Validate the JSON in the script block.
+8. Report: "已入库 N 条经历, M 个能力大类。"
 
-**Tag assignment rules:**
-- Use exact dimension names from `tagDictionary` in the library data.
-- If source role not in tagDictionary, use closest match and note it.
-- `ownership` must be traceable to source — never upgrade "参与" to "主导".
-
-**Achievement-level dedup (achievement 级去重):** After tagging, for each new achievement within the SAME internship/project entry, check against existing achievements in that entry:
-- Compute capability tag overlap + key metric overlap as rough similarity (>80% tag overlap → flag for user review).
-- Purpose: ensure achievements within one experience are mutually exclusive (each covers a distinct work activity). Duplication across DIFFERENT experiences is allowed (e.g., "used SQL" in both 字节 and 作业帮 is fine — different contexts).
-- If flagged: present to user with options — replace existing / keep both / discard new.
-- If not flagged: auto-accept.
-- This check runs per-entry (internship/project), not globally across all entries.
+**Achievement-level dedup:** For each new achievement within the SAME entry, AI judges semantic similarity. >80% similar → ask user: replace / keep both / discard. Cross-entry duplication is allowed (same skill in different companies is different context).
 
 > After saving to library: remind user that future JD tailoring can now use Path D (library matching). Ask if they have a JD ready.
 
@@ -262,69 +252,44 @@ Combine evaluation + polishing to create a JD-targeted resume. Four paths:
 ### Path D — Material Library Matching & Tailoring
 
 **1. Load library:**
-   a. Read `material-library/library.html` — parse the `<script id="library-data">` block as JSON.
-   b. From the data, get `profile` (basics + education), `skills`, `categoryIndex`, `tagDictionary`, all `experiences[]`.
+   a. Read `material-library/library.html` — parse `<script id="library-data">` as JSON.
+   b. Get `profile`, all `experiences[]`, `skillDimensions[]`.
    c. If `experiences.length < 2`, warn: "素材库条目不足（<2条），建议先入库更多经历，或使用路径 B/C。"
 
-**2. JD 解析:** Same 6-dimension framework as Evaluation + role model lookup from `references/role-competency-library.md`.
+**2. JD 解析:** Same 6-dimension framework + role model lookup from `references/role-competency-library.md`.
 
-**3. Matching algorithm — for each library experience, compute a composite score:**
-
-| Weight | Factor | How to compute |
-|--------|--------|----------------|
-| 40% | Capability tag overlap | Count tags where `{role, dimension}` matches JD role model dimensions. Score = matched / total required. |
-| 15% | Industry match | Overlap between `entry.tags.industry` and JD's business context. Cap at 1.0. |
-| 10% | Level match | Distance-based: intern→intern=1.0, intern→junior=0.7, intern→mid=0.3, intern→senior=0. Larger gap = lower score. |
-| 15% | Evidence strength | strong=1.0, moderate=0.6, weak=0.3 |
-| 20% | AI semantic judgment | LLM rates the entry's relevance to this specific JD on 0.0-1.0. Return score + one-line Chinese rationale. |
-
-**Rewrite history boost:** Before ranking, check each entry's `rewrites[]` array. If an entry has a previous rewrite targeting the same role model → add 0.10 to the composite score (capped at 1.0). Mark such entries with a 「复用」badge in the presentation table — the AI can reuse that rewrite as a starting point.
+**3. Matching algorithm — AI semantic judgment:**
+   - For each library experience, the AI reads the JD requirements + the experience's achievements and rates relevance on 0.0-1.0.
+   - Score = AI judgment. Return score + one-line Chinese rationale.
+   - Filter out scores < 0.3.
 
 **4. Rank and present:**
 
-Sort by composite score descending. Filter out scores < 0.3. Deduplicate: if same source company appears twice, keep only the highest-scored entry.
-
-Present as a scored table:
+Sort by score descending. Present as a table:
 
 ```
 ### 素材库匹配结果
 
-JD: [公司名-岗位名] | 识别模型: [模型名] ([维度1]+[维度2]+[维度3]+[维度4])
+JD: [公司名-岗位名] | 识别模型: [模型名]
 
-| # | 经历 | 匹配度 | 关键标签 | 匹配理由 |
-|---|------|--------|----------|----------|
-| 1 | exp-001 某头部互联网-产品运营 | 0.87 | 标签4/4, 互联网 | 能力全覆盖，强证据 |
-| 2 | exp-003 某AI初创-AI产品 | 0.72 | 标签3/4, AI | 数据质量+合规相关 |
-| ... | ... | ... | ... | ... |
+| # | 经历 | 匹配度 | 匹配理由 |
+|---|------|--------|----------|
+| 1 | exp-001 某头部互联网-产品运营 | 0.87 | 数据驱动+策略执行，直接映射JD维度 |
+| ... | ... | ... | ... |
 
-建议选择前2-3项。exp-002可压缩为1条或跳过。
+建议选择前2-3项。
 ```
 
 **5. User confirmation:** Accept / reorder / exclude entries. User must explicitly approve before proceeding.
 
 **6. Assemble resume-data.js:**
 - `basics` + `education` from `library.profile`
-- `internships` / `projects` from selected library entries
-- `skills` from `library.skills`, filtered to those with `evidenceRefs` pointing to selected experiences, plus `_universal` skills
+- `internships` from selected entries of type="internship", `projects` from type="project"
+- `skills` from `library.skillDimensions`, flattened to `skills[{label, text}]` format for the resume template
 
-**7. Tailor:** Re-enter standard tailoring flow — Preview before apply, rewrite achievements for JD keyword alignment, self-audit, validate JS + A4 fit.
+**7. Tailor:** Preview before apply, rewrite achievements for JD alignment, self-audit, validate JS + A4 fit.
 
-**8. Update usage tracking:** After successful tailoring, for each used entry → update `usage` fields. Update `meta.lastModified`. Serialize data back into `library.html`.
-
-**9. Auto-save rewrite (累积改写):** After user confirms the final `resume-data.js`, save each selected entry's tailored achievements to its `rewrites[]` array in the library data:
-
-```json
-{
-  "id": "rw-001",                    // unique rewrite ID
-  "targetRole": "AI产品运营",        // role model from JD
-  "targetJD": "百度-AI产品实习生",   // company + position
-  "date": "2026-05-24",
-  "outputDir": "assets/baidu-ai-pm/",
-  "achievements": [...]              // the tailored version of achievements
-}
-```
-
-This turns every job application into an asset. Next time the user targets the same role model, Path D will find the matching rewrite and the AI only needs to tweak it rather than rewrite from scratch. The original `content` is never overwritten — it remains the source of truth for new role types.
+**8. After tailoring:** Update `meta.lastModified`. Serialize data back into `library.html`.
 
 ### Steps (Paths A/B/C — after path selection):
 
@@ -387,28 +352,8 @@ Manage the persistent material library. Read `material-library/library.html` →
 | "查看素材库" / "素材库有什么" / "library list" | List all entries compactly: ID, source name, type, top 3 capability tags, usage count, evidence strength. Use a table. |
 | "查看 exp-XXX" | Show full detail of one entry: all fields, all tags, usage history, notes. |
 | "添加经历" / "add to library" | Guided interactive: ask for company/role/period/achievements → auto-tag using role-competency-library.md → preview tags for user confirmation → append to library. |
-| "删除 exp-XXX" / "remove" | Confirm with user, then remove entry by ID. Also remove its ID from any `skills[].evidenceRefs`. |
-| "编辑 exp-XXX 标签" / "update tags" | Show current tags → accept changes → write back. |
-| "素材库统计" / "library stats" | Show: total entries, entries per type, most-used entries, tag coverage matrix (which capability dimensions have evidence → which are gaps), last modified date. Cross-reference tag coverage against the user's primary roles' dimensions in `tagDictionary`. |
-| "重新打标签" / "retag all" | Re-run AI tagging (step 3 of Save to Material Library) on every entry. Useful after `role-competency-library.md` updates. Preserve `usage` history. |
-
-**Tag coverage matrix example:**
-
-```
-能力维度覆盖矩阵（针对 primaryRoles: 产品运营, AI产品运营）
-
-产品运营:
-  ✅ 数据驱动     — exp-001, sk-002
-  ✅ 策略执行力   — exp-001, proj-002
-  ✅ 效果验证力   — exp-001
-  ✅ 效率优化力   — exp-001, exp-003, proj-001
-
-AI产品运营:
-  ✅ 模型理解力   — exp-003, proj-002, sk-003
-  ✅ 数据质量力   — exp-003, proj-002
-  ✅ 合规风控力   — exp-003
-  ⚠️ 产品运营基础 — 覆盖不足（仅间接证据）
-```
+| "删除 exp-XXX" / "remove" | Confirm with user, then remove entry by ID from `experiences[]`. |
+| "素材库统计" / "library stats" | Show: total entries, entries per type, skill dimensions count, last modified date. |
 
 ## Data Editing Rules
 
@@ -434,7 +379,8 @@ Guidelines:
 - Each internship: `company`, `role`, `period` + **at least 2** achievements (2-3 total). Never let an internship appear with only 1 achievement — it makes months of work look like a single task. If compressing for space, compress the text length, not the achievement count. Each achievement covers one work activity; split mega-achievements that span multiple unrelated actions.
 - Achievement label: short tag. Achievement text: one sentence with context + action + result.
 - Projects: 2 points each — "项目背景" (context) + "关键产出" (outputs).
-- Skills: 3-5 items, each with label and descriptive text. When writing skill descriptions, consult `references/skill-taxonomy.md` to: (a) split vague skills into capability → sub-capability pairs (e.g., "会AI工具" → "AI能力 > LLM工具 > Claude Code")；(b) infer related skills the user likely has and ask for confirmation；(c) enrich descriptions with specific application scenarios (e.g., "用于业务程序搭建与自动化工作流" instead of just "熟练使用Claude Code")。
+- Skills (resume `skills[]`): 3-5 items with label + text. When writing skill descriptions, consult `references/skill-taxonomy.md` to enrich with specific application scenarios.
+- Skills (library `skillDimensions[]`): Organized as capability dimensions with sub-skills. Each dimension: `{ name, items: [{ name, proficiency, description }] }`. This format is for the library editor UI — AI flattens to `skills[{label, text}]` when assembling resume-data.js.
 
 ## A4 Fit
 

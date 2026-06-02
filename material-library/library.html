@@ -1,256 +1,597 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>素材库编辑器 — Material Library</title><style>
-:root{--navy:#1f347d;--blue:#3857c6;--gold:#b88935;--ink:#1c2030;--paper:#faf8f4;--faded:#5f6474;--line:#d7d0c2;--mist:#e9edf8;--white:#fffdf7;--pass:#4a7055;--warn:#b86824}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"Segoe UI",system-ui,sans-serif;font-size:14px;line-height:1.5;color:var(--ink);background:#f2eee3;min-height:100vh}
-.toolbar{display:flex;align-items:center;gap:1rem;padding:0.8rem 1.5rem;background:linear-gradient(145deg,#172151,#243986);color:#fff;position:sticky;top:0;z-index:100}
-.toolbar h1{font-size:1.1rem;font-weight:700;letter-spacing:0.02em}
-.toolbar .spacer{flex:1}
-.toolbar button{padding:0.4rem 1rem;border:1px solid rgba(255,255,255,0.3);border-radius:0.3rem;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;font-size:0.82rem;font-weight:600}
-.toolbar button:hover{background:rgba(255,255,255,0.2)}
-.toolbar button.primary{background:var(--gold);border-color:var(--gold)}
-.toolbar button.primary:hover{background:#c9953e}
-#save-status{font-size:0.75rem;opacity:0.7}
-.layout{display:flex;min-height:calc(100vh - 48px)}
-.sidebar{width:200px;background:var(--paper);border-right:1px solid var(--line);padding:1rem 0;flex-shrink:0}
-.sidebar .cat{display:block;width:100%;padding:0.5rem 1.2rem;text-align:left;border:none;background:none;cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--faded);transition:background 120ms}
-.sidebar .cat:hover{background:var(--mist)}
-.sidebar .cat.active{color:var(--navy);background:var(--mist);border-right:3px solid var(--navy)}
-.main{flex:1;padding:1.5rem 2rem;overflow-y:auto;max-height:calc(100vh - 48px)}
-.stats{display:flex;gap:1.5rem;margin-bottom:1.5rem}
-.stat{background:var(--white);border:1px solid var(--line);border-radius:0.5rem;padding:0.8rem 1.2rem;min-width:100px}
-.stat .num{font-size:1.4rem;font-weight:800;color:var(--navy)}
-.stat .lbl{font-size:0.72rem;color:var(--faded);letter-spacing:0.04em;text-transform:uppercase}
-.cards{display:grid;gap:0.8rem}
-.card{background:var(--white);border:1px solid var(--line);border-radius:0.5rem;overflow:hidden;transition:box-shadow 120ms}
-.card:hover{box-shadow:0 2px 8px rgba(0,0,0,0.06)}
-.card-header{display:flex;justify-content:space-between;align-items:center;padding:0.7rem 1rem;cursor:pointer;user-select:none}
-.card-header:hover{background:var(--mist)}
-.card-header .title{font-weight:700;font-size:0.9rem}
-.card-header .meta{font-size:0.75rem;color:var(--faded)}
-.card-body{display:none;padding:0 1rem 1rem;border-top:1px solid var(--line)}
-.card.open .card-body{display:block}
-.card.open .card-header{background:var(--mist)}
-.ach-item{display:flex;gap:0.5rem;align-items:flex-start;margin-bottom:0.5rem;padding:0.5rem;background:var(--mist);border-radius:0.3rem}
-.ach-item .ach-label{font-weight:700;font-size:0.8rem;white-space:nowrap;min-width:80px}
-.ach-item .ach-text{font-size:0.82rem;color:var(--faded)}
-.tags-row{display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.4rem}
-.tag{font-size:0.68rem;padding:0.15rem 0.5rem;border-radius:2mm;font-weight:600;white-space:nowrap}
-.tag.cap{background:rgba(31,52,125,0.1);color:var(--navy)}
-.tag.ind{background:rgba(184,137,53,0.12);color:var(--gold)}
-.tag.lvl{background:rgba(74,112,85,0.1);color:var(--pass)}
-.tag.own{background:rgba(184,104,36,0.1);color:var(--warn)}
-.tag.used{background:rgba(74,112,85,0.08);color:var(--pass)}
-.tag.unused{color:var(--faded);background:rgba(95,100,116,0.08)}
-.evidence-bar{font-size:0.72rem;color:var(--faded);margin-top:0.3rem}
-.evidence-bar .s{color:var(--pass);font-weight:700}
-.empty-state{text-align:center;padding:3rem;color:var(--faded)}
-fieldset{border:1px solid var(--line);border-radius:0.5rem;padding:0.8rem 1rem;margin-top:0.5rem}
-fieldset legend{font-weight:700;font-size:0.82rem;padding:0 0.4rem}
-.form-row{display:flex;gap:0.5rem;align-items:center;margin-bottom:0.4rem}
-.form-row label{font-size:0.78rem;color:var(--faded);min-width:60px}
-.form-row input,.form-row textarea,.form-row select{flex:1;padding:0.35rem 0.5rem;border:1px solid var(--line);border-radius:0.25rem;font:inherit;font-size:0.82rem}
-.form-row textarea{height:60px;resize:vertical}
-.add-btn{padding:0.4rem 1rem;border:none;border-radius:0.3rem;background:var(--navy);color:#fff;cursor:pointer;font-size:0.8rem;font-weight:600;margin-top:0.5rem}
-.add-btn:hover{background:var(--blue)}
-.skill-row{display:flex;gap:0.5rem;align-items:baseline;padding:0.5rem;background:var(--mist);border-radius:0.3rem;margin-bottom:0.5rem}
-.skill-row .sk-label{font-weight:700;font-size:0.82rem;min-width:60px}
-.skill-row .sk-text{font-size:0.78rem;color:var(--faded);flex:1}
-.skill-row .sk-pro{font-size:0.72rem;color:var(--pass);font-weight:600;white-space:nowrap}
-.rewrite-entry{font-size:0.72rem;padding:0.3rem 0.6rem;margin:0.2rem 0;background:rgba(74,112,85,0.06);border-radius:0.25rem}
-.rewrite-entry .rw-date{color:var(--faded)}
-.rewrite-entry .rw-role{color:var(--navy);font-weight:600}
-.hidden{display:none}
-@media(max-width:720px){.sidebar{width:120px}.main{padding:1rem}.stats{flex-wrap:wrap}}
-</style></head><body>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>素材库</title>
+<style>
+:root {
+  --surface: oklch(98.5% .003 95);
+  --panel: oklch(97% .002 260);
+  --hover: oklch(96% .004 95);
+  --border: oklch(88% .005 90);
+  --border-light: oklch(92% .003 90);
+  --text: oklch(20% .005 95);
+  --text-secondary: oklch(45% .01 90);
+  --accent: oklch(52% .16 265);
+  --accent-hover: oklch(45% .17 265);
+  --accent-subtle: oklch(52% .16 265 / .06);
+  --success: oklch(55% .16 142);
+  --warning: oklch(62% .18 75);
+  --error: oklch(50% .22 25);
+  --error-subtle: oklch(50% .22 25 / .06);
+  --font-ui: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", -apple-system, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --shadow-sm: 0 1px 3px oklch(0% 0 0 / .06);
+  --shadow-md: 0 8px 32px oklch(0% 0 0 / .08);
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --fast: .15s;
+  --normal: .22s;
+}
+*, :before, :after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-font-smoothing: antialiased; font-size: 18px; }
+body { font-family: var(--font-ui); color: var(--text); background: var(--surface); line-height: 1.6; min-height: 100vh; }
 
-<div class="toolbar">
-<h1>素材库编辑器</h1>
-<span class="spacer"></span>
-<span id="save-status"></span>
-<button onclick="saveLibrary()" class="primary" title="通过 File System Access API 直接写入文件">保存到文件</button>
-</div>
+.container { max-width: 960px; margin: 0 auto; padding: 1.5rem 2rem 4rem; }
 
-<div class="layout">
-<div class="sidebar" id="sidebar"></div>
-<div class="main" id="main"></div>
-</div>
+/* Header */
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.page-header h1 { font-size: 1.4rem; font-weight: 600; letter-spacing: -.01em; }
+
+/* Tabs */
+.tabs { display: flex; gap: 0; margin-bottom: 1rem; border-bottom: 1px solid var(--border); }
+.tab { font-size: .88rem; font-family: var(--font-ui); padding: .45rem 1.1rem .5rem; border: none; background: none; color: var(--text-secondary); cursor: pointer; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all var(--fast) var(--ease-out); }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* Filter row */
+.filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: .85rem; }
+.filter-pills { display: flex; gap: .25rem; }
+.filter-pill { font-size: .76rem; font-family: var(--font-ui); padding: .28rem .72rem; border-radius: 999px; border: 1px solid var(--border); background: none; color: var(--text-secondary); cursor: pointer; transition: all var(--fast) var(--ease-out); }
+.filter-pill:hover { background: var(--hover); color: var(--text); }
+.filter-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Buttons */
+.btn { font-size: .8rem; font-family: var(--font-ui); border-radius: var(--radius-sm); cursor: pointer; transition: all var(--fast) var(--ease-out); display: inline-flex; align-items: center; gap: .3rem; padding: .45rem .9rem; font-weight: 500; border: none; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-ghost { background: none; color: var(--text-secondary); }
+.btn-ghost:hover { background: var(--hover); color: var(--text); }
+.btn-danger { background: var(--error-subtle); color: var(--error); }
+.btn-danger:hover { background: oklch(50% .22 25 / .12); }
+.btn-sm { font-size: .72rem; padding: .25rem .6rem; }
+
+/* Entry card */
+.entry-card { border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1rem 1.15rem; margin-bottom: .75rem; background: var(--surface); transition: box-shadow var(--fast) var(--ease-out), border-color var(--fast) var(--ease-out); }
+.entry-card:hover { border-color: var(--border); box-shadow: var(--shadow-sm); }
+.entry-card.internship { border-left: 3px solid transparent; }
+.entry-card.project { border-left: 3px solid transparent; }
+.entry-card .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; }
+.entry-card .card-head .info { flex: 1; min-width: 0; }
+.entry-card .card-head .info h3 { font-size: .95rem; font-weight: 600; line-height: 1.35; display: flex; align-items: center; gap: .4rem; }
+.entry-card .card-head .info .meta { font-size: .76rem; color: var(--text-secondary); margin-top: .15rem; }
+.type-badge { font-size: .58rem; font-weight: 600; padding: .1rem .4rem; border-radius: 999px; white-space: nowrap; flex-shrink: 0; letter-spacing: .03em; }
+.type-badge.internship { background: oklch(55% .16 142 / .12); color: var(--success); }
+.type-badge.project { background: var(--accent-subtle); color: var(--accent); }
+.entry-card .card-head .actions { display: flex; gap: .25rem; flex-shrink: 0; }
+.entry-card .card-head .card-right { display: flex; align-items: center; gap: .5rem; flex-shrink: 0; }
+.entry-card .card-head .card-right .period { font-size: .7rem; color: var(--text-secondary); white-space: nowrap; }
+/* Saved flash */
+@keyframes saved-flash { 0% { background: var(--accent-subtle); } 100% { background: var(--surface); } }
+.entry-card.flash { animation: saved-flash 1.5s var(--ease-out); }
+
+.entry-card .ach-section { margin-top: .6rem; }
+.entry-card .ach { display: flex; gap: .3rem; align-items: flex-start; padding: .55rem 0; font-size: .85rem; line-height: 1.65; }
+.entry-card .ach + .ach { border-top: 1px solid var(--border-light); }
+.entry-card .ach .ach-text { color: var(--text-secondary); flex: 1; }
+.entry-card .ach .ach-text strong { color: var(--text); }
+.entry-card .ach .ach-actions { display: flex; gap: .15rem; flex-shrink: 0; opacity: .45; transition: opacity var(--fast); }
+.entry-card .ach:hover .ach-actions { opacity: 1; }
+.ach-add { margin-top: .4rem; }
+.ach-add-btn { font-size: .82rem; color: var(--text-secondary); background: none; border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: .4rem .8rem; cursor: pointer; font-family: var(--font-ui); transition: all var(--fast); width: 100%; text-align: center; }
+.ach-add-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-subtle); }
+
+/* Skill dimension card */
+.dim-card { border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1rem 1.15rem; margin-bottom: .75rem; background: var(--surface); }
+.dim-card .dim-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .55rem; }
+.dim-card .dim-head h3 { font-size: .88rem; font-weight: 600; }
+.dim-card .dim-head .dim-actions { display: flex; gap: .25rem; }
+.dim-card .sub-skill { display: flex; align-items: baseline; gap: .5rem; padding: .45rem .4rem; font-size: .82rem; border-radius: var(--radius-sm); }
+.dim-card .sub-skill:hover { background: var(--hover); }
+.dim-card .sub-skill .ss-name { font-weight: 600; min-width: 90px; color: var(--text); }
+.dim-card .sub-skill .ss-desc { flex: 1; color: var(--text-secondary); }
+.dim-card .sub-skill .ss-prof { font-size: .68rem; font-weight: 600; padding: .1rem .45rem; border-radius: 999px; white-space: nowrap; }
+.ss-prof.prof-精通 { background: oklch(55% .16 142 / .15); color: var(--success); }
+.ss-prof.prof-熟练 { background: oklch(55% .16 142 / .1); color: var(--success); }
+.ss-prof.prof-熟悉 { background: oklch(62% .18 75 / .1); color: var(--warning); }
+.ss-prof.prof-了解 { background: oklch(50% .22 25 / .06); color: var(--error); }
+.dim-card .sub-skill .ss-actions { display: flex; gap: .15rem; flex-shrink: 0; opacity: .45; transition: opacity var(--fast); }
+.dim-card .sub-skill:hover .ss-actions { opacity: 1; }
+.dim-add-btn { width: 100%; text-align: center; font-size: .82rem; color: var(--text-secondary); background: none; border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: .4rem .8rem; cursor: pointer; font-family: var(--font-ui); margin-top: .5rem; transition: all var(--fast); }
+.dim-add-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-subtle); }
+
+/* Empty */
+.empty-state { text-align: center; padding: 2.5rem 1rem; color: var(--text-secondary); font-size: .8rem; }
+
+/* Overlay */
+.overlay { position: fixed; inset: 0; z-index: 60; background: oklch(0% 0 0 / .4); display: flex; justify-content: center; align-items: flex-start; padding-top: 8vh; overflow-y: auto; }
+.overlay-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.5rem; width: 90%; max-width: 640px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-md); }
+.overlay-panel h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
+.form-group { margin-bottom: .8rem; }
+.form-group label { display: block; font-size: .76rem; font-weight: 500; color: var(--text-secondary); margin-bottom: .2rem; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; font-size: .88rem; font-family: var(--font-ui); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: .5rem .6rem; background: var(--surface); outline: none; transition: border-color var(--fast); }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
+.form-group textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+.ach-edit-block { border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: .7rem; margin-bottom: .6rem; background: var(--panel); }
+.ach-edit-block .ach-edit-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: .35rem; }
+.ach-edit-block input { font-size: .82rem !important; }
+.ach-edit-block textarea { font-size: .82rem !important; min-height: 80px; line-height: 1.55; overflow: hidden; resize: none; }
+.ach-edit-block textarea:focus { overflow: auto; resize: vertical; }
+.form-actions { display: flex; gap: .5rem; justify-content: flex-end; margin-top: 1rem; }
+
+@media (max-width: 600px) {
+  .container { padding: 1rem .75rem 3rem; }
+  .overlay-panel { padding: 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="container" id="app"></div>
 
 <script id="library-data" type="application/json">
-// ── 素材库完整数据 ──
-// 数据结构：
-//   meta           — 版本、候选⼈信息
-//   profile        — 不变的 basics + education
-//   experiences[]  — 所有经历（实习+项目），每条带 capability/industry 标签、证据评估、使用追踪、累积改写
-//   skills[]       — 技能清单，带 proficiency + evidenceRefs
-//   tagDictionary  — 所有可用标签（从 role-competency-library.md 提取）
-//   categoryIndex  — 大类索引（用于侧边栏导航）
-
-{"meta":{"version":"1.0","lastModified":"2026-05-25","lastModifiedBy":"AI","candidateName":"李小明","primaryIndustries":["互联网","AI","快消"],"targetLevel":"intern"},"profile":{"basics":{"name":"李小明","intent":"求职意向：产品运营实习生","location":"上海","undergraduate":"复旦大学 新闻学院 传播学","graduate":"上海交通大学 媒体与传播学院 新闻与传播","graduationYear":"2026","email":"lixiaoming@example.com","phone":"13900001111"},"education":[{"degree":"硕士","school":"上海交通大学","college":"媒体与传播学院","major":"新闻与传播","period":"2024.09-2026.06"},{"degree":"本科","school":"复旦大学","college":"新闻学院","major":"传播学","period":"2020.09-2024.06"}]},"experiences":[{"id":"exp-001","type":"internship","source":{"company":"某头部互联网公司-内容生态部","role":"产品运营实习生","period":"2025.06-2025.09"},"content":{"achievements":[{"label":"内容供给策略优化","text":"负责短视频内容池的供给侧分析，通过SQL提取6个月消费与互动数据（样本量50W+条），识别出低互动率且高曝光的「高曝低效」内容类型4类，输出供给质量分析报告并推动汰换机制上线。优质内容曝光占比从31%提升至38%，人均消费时长从12.4min提升至14.6min，日均低质内容曝光量下降约40W次。"},{"label":"创作者激励体系搭建","text":"主导创作者激励体系的产品化设计：分析10W+创作者行为数据，按投稿频次与互动表现划分为4个等级，设计对应成长任务（新手引导→进阶挑战→高阶权益）与阶梯式流量激励。输出PRD初稿并协同研发、运营、设计团队推动上线，周活跃创作者数从8,200提升至11,100，头部创作者月流失率从18%降至6%。"},{"label":"产品工具搭建与体验优化","text":"针对SKU认知门槛高、推荐不准的业务卡点，0-1搭建内容产品导航平台，实现「内容类型×用户分层」交叉定位与一键跳转。单次运营决策时长降低30min，上线当周核心业务线渗透率达60%，人均周检索7次，信息查找效率提升显著。"}]},"tags":{"capability":[{"role":"产品运营","dimension":"数据驱动"},{"role":"产品运营","dimension":"策略执行力"},{"role":"产品运营","dimension":"效率优化力"},{"role":"产品运营","dimension":"效果验证力"},{"role":"AI产品运营","dimension":"数据质量力"}],"industry":["互联网","内容平台"],"roleLevel":"intern","ownership":"推动"},"evidence":{"strength":"strong","hasQuantifiedData":true,"keyMetrics":"50W+样本量, 31%→38%曝光占比, 12.4→14.6min, 40W次低质曝光下降"},"usage":{"timesUsed":0,"lastUsed":null,"usedInRoles":[]},"rewrites":[],"notes":"最有JD适配弹性的经历，含SQL+PRD+跨团队协同证据。可面向内容运营、数据运营、AI产品运营三种角色改写。"},{"id":"exp-002","type":"internship","source":{"company":"某快消品牌-市场部","role":"品牌营销实习生","period":"2025.02-2025.05"},"content":{"achievements":[{"label":"新品上市推广与用户增长","text":"负责新品上市的用户增长与内容触达策略：基于目标客群画像设计社交媒体种草内容矩阵，筛选50+垂类KOL并按粉丝画像分层投放，最终触达用户超500万，新品首月销售额超额20%达成目标。"},{"label":"用户洞察与竞品分析","text":"开展消费者深度访谈与问卷调研（N=200+），结合电商评论挖掘与竞品动态追踪，定位消费者核心决策因子，输出品类机会报告，驱动产品卖点提炼与包装优化，新品上市后复购率提升15个百分点。"}]},"tags":{"capability":[{"role":"市场营销","dimension":"用户洞察力"},{"role":"市场营销","dimension":"渠道策略力"},{"role":"市场营销","dimension":"内容创意力"},{"role":"市场营销","dimension":"ROI验证力"}],"industry":["快消"],"roleLevel":"intern","ownership":"推动"},"evidence":{"strength":"strong","hasQuantifiedData":true,"keyMetrics":"500W+触达, 超额20%, N=200+调研, 复购率+15%"},"usage":{"timesUsed":0,"lastUsed":null,"usedInRoles":[]},"rewrites":[],"notes":"营销/快消方向核心证据。投非营销岗时可压缩为1条achievement，突出用户洞察和数据分析部分。"},{"id":"exp-003","type":"internship","source":{"company":"某AI初创公司-产品部","role":"AI产品实习生","period":"2024.10-2025.01"},"content":{"achievements":[{"label":"AI内容审核工作流搭建","text":"发现审核团队日均处理量瓶颈（300条/人）导致审核时效不达标，分析工作流中可自动化环节，设计LLM预审方案并撰写PRD协调工程团队落地。人工审核量从300条/人降至120条/人，审核时效从4h缩短至1.5h，内容合规风险事件发生率降低80%。"},{"label":"数据标注体系与质量标准建设","text":"为解决AI模型训练数据质量不稳定的问题，设计涵盖基础体验（一致性、记忆力）与策略表现（合规度、准确度）等12维量化评分矩阵的标注SOP。标注结果二次加权Kappa系数达0.7，数据标注一致性提升40%，模型训练效果提升12%。"}]},"tags":{"capability":[{"role":"AI产品运营","dimension":"模型理解力"},{"role":"AI产品运营","dimension":"数据质量力"},{"role":"AI产品运营","dimension":"合规风控力"},{"role":"产品运营","dimension":"效率优化力"}],"industry":["AI","内容平台"],"roleLevel":"intern","ownership":"推动"},"evidence":{"strength":"strong","hasQuantifiedData":true,"keyMetrics":"300→120条/人, 4h→1.5h, 合规风险-80%, Kappa 0.7, 标注一致性+40%"},"usage":{"timesUsed":0,"lastUsed":null,"usedInRoles":[]},"rewrites":[],"notes":"AI岗核心证据。LLM预审+PRD+SOP+数据标注闭环，也适合策略运营岗。ownership标注为'推动'而非'主导'。"},{"id":"proj-001","type":"project","source":{"title":"短视频热点预测模型","role":"核心成员","period":"2025.07-2025.09"},"content":{"points":["项目背景：内容运营团队在热点选题上高度依赖人工经验判断，选题成功率仅35%，且响应速度落后竞品2-3小时，导致流量流失。","关键产出：（1）构建基于历史爆款内容的12维特征指标体系，结合时序分析预测热点趋势，选题命中率从35%提升至49%；（2）搭建自动化热点监控看板，实现分钟级异动预警，响应速度缩短至30min以内。"]},"tags":{"capability":[{"role":"产品运营","dimension":"数据驱动"},{"role":"产品运营","dimension":"效率优化力"},{"role":"策略产品经理","dimension":"策略设计力"}],"industry":["互联网","内容平台"],"roleLevel":"intern","ownership":"推动"},"evidence":{"strength":"moderate","hasQuantifiedData":true,"keyMetrics":"35%→49%命中率, 响应30min以内, 12维特征体系"},"usage":{"timesUsed":0,"lastUsed":null,"usedInRoles":[]},"rewrites":[],"notes":"技术含量较高的项目，role为核心成员而非独立owner。适合数据运营、策略产品岗。投非数据岗时可压缩或砍掉。"},{"id":"proj-002","type":"project","source":{"title":"AI 产品内容生态优化项目","role":"负责人","period":"2025.10-2025.12"},"content":{"points":["项目背景：AI对话产品在多场景下内容生成质量不稳定，用户投诉率高，且缺乏系统性的效果评估机制。","关键产出：（1）搭建多语言平行语料库与自动化评估管线，实现内容质量的分钟级监控；（2）设计3类递进式Prompt约束规则，通过人工测评迭代3版Prompt，内容OOC率降低85%，用户对话续写率提升30%。"]},"tags":{"capability":[{"role":"AI产品经理","dimension":"模型理解力"},{"role":"AI产品经理","dimension":"效果评估力"},{"role":"AI产品运营","dimension":"数据质量力"},{"role":"产品运营","dimension":"策略执行力"}],"industry":["AI","内容平台"],"roleLevel":"intern","ownership":"推动"},"evidence":{"strength":"moderate","hasQuantifiedData":true,"keyMetrics":"OOC率-85%, 续写率+30%, 3版Prompt迭代, 多语言评估管线"},"usage":{"timesUsed":0,"lastUsed":null,"usedInRoles":[]},"rewrites":[],"notes":"AI产品/运营方向核心证据。适合AI产品、AI运营、内容策略岗。"}],"skills":[{"id":"sk-001","label":"产品技能","category":"运营大类","proficiency":"熟练","evidenceRefs":["exp-001","exp-003"],"text":"熟练使用Axure、墨刀进行原型设计，具备PRD撰写与需求管理经验；熟悉Scrum开发流程与跨团队项目协同；掌握用户访谈、问卷调研、可用性测试等用户研究方法。","tags":{"capability":[{"role":"产品运营","dimension":"策略执行力"},{"role":"产品运营","dimension":"效率优化力"}]}},{"id":"sk-002","label":"数据技能","category":"运营大类","proficiency":"熟练","evidenceRefs":["exp-001"],"text":"熟练使用SQL进行日常数据提取与分析；精通Excel数据透视表与可视化；具备Python基础编程与自动化脚本编写能力；熟悉神策、GrowingIO等数据分析平台。","tags":{"capability":[{"role":"产品运营","dimension":"数据驱动"},{"role":"数据分析","dimension":"取数处理力"}]}},{"id":"sk-003","label":"AI工具","category":"运营大类","proficiency":"掌握","evidenceRefs":["exp-003","proj-002"],"text":"熟悉LLM应用与Prompt工程，有AI辅助内容审核与内容生成质量评估的实践经验；掌握Claude Code、Coze等AI开发工具的基础使用。","tags":{"capability":[{"role":"AI产品经理","dimension":"模型理解力"},{"role":"AI产品运营","dimension":"模型理解力"}]}},{"id":"sk-004","label":"语言能力","category":"_universal","proficiency":"熟练","evidenceRefs":[],"text":"CET-4、CET-6；英语读写流利，可独立完成英文文档撰写与跨文化业务沟通；具备中英双语内容策划与编辑能力。","tags":{"capability":[]}}],"tagDictionary":{"产品运营":{"dimensions":["数据驱动","策略执行力","效果验证力","效率优化力"]},"用户运营":{"dimensions":["用户洞察力","分层触达力","留存策略力","数据验证力"]},"内容运营":{"dimensions":["内容策略力","供应链管理力","质量把控力","消费效果力"]},"活动运营":{"dimensions":["创意策划力","执行落地力","资源协调力","效果复盘力"]},"商家运营":{"dimensions":["招募策略力","培育赋能力","分层管理力","GMV驱动力"]},"电商运营":{"dimensions":["货品策略力","流量获取力","转化优化力","复购留存力"]},"AI产品运营":{"dimensions":["产品运营基础","模型理解力","数据质量力","合规风控力"]},"增长运营":{"dimensions":["增长模型力","渠道实验力","转化优化力","规模化力"]},"商业化运营":{"dimensions":["变现策略力","定价优化力","付费转化力","收入驱动力"]},"策略运营":{"dimensions":["规则设计力","数据建模力","策略调优力","效果验证力"]},"新媒体运营":{"dimensions":["内容创作力","平台理解力","粉丝增长力","流量转化力"]},"渠道运营":{"dimensions":["渠道拓展力","投放优化力","商务谈判力","ROI分析力"]},"社群运营":{"dimensions":["社群搭建力","活跃维护力","用户粘性力","私域转化力"]},"数据运营":{"dimensions":["指标体系力","分析洞察力","策略建议力","业务联动力"]},"生态运营":{"dimensions":["平台治理力","资源整合力","生态合作力","规则设计力"]},"C端产品经理":{"dimensions":["用户洞察力","体验设计力","AB验证力","数据驱动力"]},"B端产品经理":{"dimensions":["业务理解力","效率设计力","权限模型力","客户落地力"]},"商业化产品经理":{"dimensions":["变现设计力","定价策略力","广告系统力","收入驱动力"]},"AI产品经理":{"dimensions":["模型理解力","能力定义力","体验设计力","效果评估力"]},"策略产品经理":{"dimensions":["算法理解力","策略设计力","效果实验力","系统优化力"]},"数据产品经理":{"dimensions":["业务理解力","数据基建力","工具设计力","效率提升力"]},"渠道拓展":{"dimensions":["渠道策略力","商务开拓力","合作关系力","增长贡献力"]},"市场推广":{"dimensions":["品牌策略力","整合传播力","内容营销力","效果衡量力"]},"商务合作":{"dimensions":["合作策略力","谈判执行力","资源整合力","价值创造力"]},"架构师":{"dimensions":["系统设计力","技术选型力","性能优化力","技术治理力"]},"前端工程师":{"dimensions":["技术深度力","工程化能力","用户体验力","业务价值力"]},"后端工程师":{"dimensions":["技术深度力","系统可靠性力","数据设计力","业务支撑力"]},"移动端工程师":{"dimensions":["平台能力力","性能优化力","用户体验力","工程效率力"]},"测试工程师":{"dimensions":["质量体系建设力","自动化能力","风险防控力","效率提升力"]},"运维工程师":{"dimensions":["基础架构力","稳定性保障力","自动化能力","成本优化力"]},"数据分析":{"dimensions":["问题定义力","取数处理力","分析洞察力","业务影响力"]},"商业分析":{"dimensions":["行业研究力","商业建模力","战略建议力","决策推动力"]},"战略分析":{"dimensions":["战略思维力","系统性研究力","高层视野力","长期价值力"]},"市场营销":{"dimensions":["用户洞察力","渠道策略力","内容创意力","ROI验证力"]},"产品设计":{"dimensions":["用户研究力","交互设计力","视觉产出力","落地验证力"]},"人力资源":{"dimensions":["招聘交付力","员工关系力","组织建设力","数据运营力"]},"industry":["互联网","AI","内容平台","快消","电商","教育","医疗","汽车","金融","企业服务","游戏"],"ownership":["主导","参与","协助","支持","推动","协同","落地","负责"],"roleLevel":["intern","junior","mid","senior","lead"]},"categoryIndex":{"运营大类":{"models":["产品运营","用户运营","内容运营","活动运营","商家运营","电商运营","AI产品运营","增长运营","商业化运营","策略运营","新媒体运营","渠道运营","社群运营","数据运营","生态运营"],"entries":["exp-001","exp-003","proj-001","proj-002"]},"营销大类":{"models":["市场营销"],"entries":["exp-002"]},"产品大类":{"models":["C端产品经理","B端产品经理","商业化产品经理","AI产品经理","策略产品经理","数据产品经理"],"entries":[]},"市场大类":{"models":["渠道拓展","市场推广","商务合作"],"entries":[]},"技术大类":{"models":["架构师","前端工程师","后端工程师","移动端工程师","测试工程师","运维工程师"],"entries":[]},"分析大类":{"models":["数据分析","商业分析","战略分析"],"entries":[]},"设计大类":{"models":["产品设计"],"entries":[]},"人力大类":{"models":["人力资源"],"entries":[]}}}
+{"meta":{"version":"3.0","lastModified":"2026-06-03","candidateName":"李小明"},"profile":{"basics":{"name":"李小明","intent":"求职意向：产品运营实习生","location":"上海","undergraduate":"复旦大学 新闻学院 传播学","graduate":"上海交通大学 媒体与传播学院 新闻与传播","graduationYear":"2026","email":"lixiaoming@example.com","phone":"13900001111"},"education":[{"degree":"硕士","school":"上海交通大学","college":"媒体与传播学院","major":"新闻与传播","period":"2024.09-2026.06"},{"degree":"本科","school":"复旦大学","college":"新闻学院","major":"传播学","period":"2020.09-2024.06"}]},"experiences":[{"id":"exp-001","type":"internship","source":{"company":"某头部互联网公司-内容生态部","role":"产品运营实习生","period":"2025.06-2025.09"},"content":{"achievements":[{"label":"内容供给策略优化","text":"负责短视频内容池的供给侧分析，通过SQL提取6个月消费与互动数据（样本量50W+条），识别出低互动率且高曝光的「高曝低效」内容类型4类，输出供给质量分析报告并推动汰换机制上线。优质内容曝光占比从31%提升至38%，人均消费时长从12.4min提升至14.6min，日均低质内容曝光量下降约40W次。"},{"label":"创作者激励体系搭建","text":"主导创作者激励体系的产品化设计：分析10W+创作者行为数据，按投稿频次与互动表现划分为4个等级，设计对应成长任务（新手引导→进阶挑战→高阶权益）与阶梯式流量激励。输出PRD初稿并协同研发、运营、设计团队推动上线，周活跃创作者数从8,200提升至11,100，头部创作者月流失率从18%降至6%。"},{"label":"产品工具搭建与体验优化","text":"针对SKU认知门槛高、推荐不准的业务卡点，0-1搭建内容产品导航平台，实现「内容类型×用户分层」交叉定位与一键跳转。单次运营决策时长降低30min，上线当周核心业务线渗透率达60%，人均周检索7次，信息查找效率提升显著。"}]}},{"id":"exp-002","type":"internship","source":{"company":"某快消品牌-市场部","role":"品牌营销实习生","period":"2025.02-2025.05"},"content":{"achievements":[{"label":"新品上市推广与用户增长","text":"负责新品上市的用户增长与内容触达策略：基于目标客群画像设计社交媒体种草内容矩阵，筛选50+垂类KOL并按粉丝画像分层投放，最终触达用户超500万，新品首月销售额超额20%达成目标。"},{"label":"用户洞察与竞品分析","text":"开展消费者深度访谈与问卷调研（N=200+），结合电商评论挖掘与竞品动态追踪，定位消费者核心决策因子，输出品类机会报告，驱动产品卖点提炼与包装优化，新品上市后复购率提升15个百分点。"}]}},{"id":"exp-003","type":"internship","source":{"company":"某AI初创公司-产品部","role":"AI产品实习生","period":"2024.10-2025.01"},"content":{"achievements":[{"label":"AI内容审核工作流搭建","text":"发现审核团队日均处理量瓶颈（300条/人）导致审核时效不达标，分析工作流中可自动化环节，设计LLM预审方案并撰写PRD协调工程团队落地。人工审核量从300条/人降至120条/人，审核时效从4h缩短至1.5h，内容合规风险事件发生率降低80%。"},{"label":"数据标注体系与质量标准建设","text":"为解决AI模型训练数据质量不稳定的问题，设计涵盖基础体验（一致性、记忆力）与策略表现（合规度、准确度）等12维量化评分矩阵的标注SOP。标注结果二次加权Kappa系数达0.7，数据标注一致性提升40%，模型训练效果提升12%。"}]}},{"id":"proj-001","type":"project","source":{"title":"短视频热点预测模型","role":"核心成员","period":"2025.07-2025.09"},"content":{"achievements":[{"label":"项目背景","text":"内容运营团队在热点选题上高度依赖人工经验判断，选题成功率仅35%，且响应速度落后竞品2-3小时，导致流量流失。"},{"label":"关键产出","text":"（1）构建基于历史爆款内容的12维特征指标体系，结合时序分析预测热点趋势，选题命中率从35%提升至49%；（2）搭建自动化热点监控看板，实现分钟级异动预警，响应速度缩短至30min以内。"}]}},{"id":"proj-002","type":"project","source":{"title":"AI 产品内容生态优化项目","role":"负责人","period":"2025.10-2025.12"},"content":{"achievements":[{"label":"项目背景","text":"AI对话产品在多场景下内容生成质量不稳定，用户投诉率高，且缺乏系统性的效果评估机制。"},{"label":"关键产出","text":"（1）搭建多语言平行语料库与自动化评估管线，实现内容质量的分钟级监控；（2）设计3类递进式Prompt约束规则，通过人工测评迭代3版Prompt，内容OOC率降低85%，用户对话续写率提升30%。"}]}}],"skillDimensions":[{"name":"产品技能","items":[{"name":"熟练使用Axure、","proficiency":"熟练","description":"熟练使用Axure、墨刀进行原型设计，具备PRD撰写与需求管理经验"},{"name":"熟悉Scrum开发流","proficiency":"熟练","description":"熟悉Scrum开发流程与跨团队项目协同"},{"name":"掌握用户访谈、问卷调","proficiency":"熟练","description":"掌握用户访谈、问卷调研、可用性测试等用户研究方法。"}]},{"name":"数据技能","items":[{"name":"熟练使用SQL进行日","proficiency":"熟练","description":"熟练使用SQL进行日常数据提取与分析"},{"name":"精通Excel数据透","proficiency":"熟练","description":"精通Excel数据透视表与可视化"},{"name":"具备Python基础","proficiency":"熟练","description":"具备Python基础编程与自动化脚本编写能力"},{"name":"熟悉神策、Growi","proficiency":"熟练","description":"熟悉神策、GrowingIO等数据分析平台。"}]},{"name":"AI工具","items":[{"name":"熟悉LLM应用与Pr","proficiency":"掌握","description":"熟悉LLM应用与Prompt工程，有AI辅助内容审核与内容生成质量评估的实践经验"},{"name":"掌握Claude C","proficiency":"掌握","description":"掌握Claude Code、Coze等AI开发工具的基础使用。"}]},{"name":"语言能力","items":[{"name":"CET-4、CET-","proficiency":"熟练","description":"CET-4、CET-6"},{"name":"英语读写流利，可独立","proficiency":"熟练","description":"英语读写流利，可独立完成英文文档撰写与跨文化业务沟通"},{"name":"具备中英双语内容策划","proficiency":"熟练","description":"具备中英双语内容策划与编辑能力。"}]}]}
 </script>
 
 <script>
-// ═══════════════════════════════════════
-// 编辑器主逻辑
-// ═══════════════════════════════════════
-
-const LIB = (function(){
-  try{return JSON.parse(document.getElementById('library-data').textContent.trim())}
-  catch(e){return null}
+// ═══ Parse ═══
+var LIB;
+(function() {
+  try { LIB = JSON.parse(document.getElementById('library-data').textContent.trim()); }
+  catch(e) { document.getElementById('app').innerHTML = '<div class="empty-state">数据解析失败</div>'; throw e; }
 })();
+if (!LIB) throw new Error('Parse failed');
 
-if(!LIB){document.getElementById('main').innerHTML='<div class="empty-state"><h3>数据解析失败</h3><p>请检查 library-data 脚本块中的 JSON 是否有效。</p></div>';throw new Error("Library data parse failed")}
+// ═══ State ═══
+var activeTab = 'entries'; // 'entries' | 'skills'
+var entryFilter = '全部';  // '全部' | '实习' | '项目'
+var editingEntry = null;   // null | entry object (null = create new)
+var editingAchIdx = null;  // for inline achievement editing
+var editingDim = null;     // dimension name being edited
+var editingSkill = null;   // { dimName, idx } for sub-skill being edited
+var deleteConfirm = null;
 
-const ALL_CATS = Object.keys(LIB.categoryIndex);
-let activeCategory = '运营大类';
+// ═══ Helpers ═══
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function genId() { return 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6); }
 
-function catEntries(cat){return (LIB.categoryIndex[cat]||{}).entries||[]}
-function catModels(cat){return (LIB.categoryIndex[cat]||{}).models||[]}
-function expById(id){return LIB.experiences.find(function(e){return e.id===id})}
-function skillById(id){return LIB.skills.find(function(s){return s.id===id})}
-
-function renderSidebar(){
-  var html='';
-  ALL_CATS.forEach(function(c){
-    var count=catEntries(c).length;
-    html+='<button class="cat'+(c===activeCategory?' active':'')+'" onclick="switchCategory(\''+c+'\')">'+c+' <span style="font-size:0.7rem;opacity:0.6">'+count+'</span></button>';
+// ═══ Entry filtering ═══
+function filtered() {
+  if (entryFilter === '全部') return LIB.experiences;
+  var t = entryFilter === '实习' ? 'internship' : 'project';
+  return LIB.experiences.filter(function(e) { return e.type === t; });
+}
+function sorted(entries) {
+  return entries.slice().sort(function(a, b) {
+    if (a.type !== b.type) return a.type === 'internship' ? -1 : 1;
+    var ap = a.source.period || '', bp = b.source.period || '';
+    var am = ap.match(/(\d{4})/), bm = bp.match(/(\d{4})/);
+    var ay = am ? +am[1] : 0, by = bm ? +bm[1] : 0;
+    return by - ay;
   });
-  document.getElementById('sidebar').innerHTML=html;
 }
 
-function switchCategory(cat){
-  activeCategory=cat;
-  renderSidebar();
-  renderMain();
+// ═══ Skill helpers ═══
+function ensureSkillDimensions() {
+  if (!LIB.skillDimensions) LIB.skillDimensions = [];
+}
+function findSkillInDim(dimName, skillName) {
+  var dim = LIB.skillDimensions.find(function(d) { return d.name === dimName; });
+  if (!dim) return -1;
+  return dim.items.findIndex(function(s) { return s.name === skillName; });
 }
 
-function renderStats(){
-  var total=LIB.experiences.length;
-  var interns=LIB.experiences.filter(function(e){return e.type==='internship'}).length;
-  var projects=LIB.experiences.filter(function(e){return e.type==='project'}).length;
-  var used=LIB.experiences.filter(function(e){return e.usage.timesUsed>0}).length;
-  return '<div class="stats">'+
-    '<div class="stat"><div class="num">'+total+'</div><div class="lbl">总经历</div></div>'+
-    '<div class="stat"><div class="num">'+interns+'</div><div class="lbl">实习</div></div>'+
-    '<div class="stat"><div class="num">'+projects+'</div><div class="lbl">项目</div></div>'+
-    '<div class="stat"><div class="num">'+used+'</div><div class="lbl">已使用</div></div>'+
-    '<div class="stat"><div class="num">'+LIB.skills.length+'</div><div class="lbl">技能</div></div>'+
+// ═══ Render ═══
+function render() {
+  var app = document.getElementById('app');
+  app.innerHTML = renderHeader() + renderTabs() + renderBody();
+  if (deleteConfirm) renderDeleteConfirm();
+  if (editingEntry !== null) renderEntryEditor();
+  if (editingDim !== null || editingSkill !== null) renderSkillEditor();
+}
+
+function renderHeader() {
+  return '<div class="page-header"><h1>素材库</h1>' +
+    (activeTab === 'entries'
+      ? '<button class="btn btn-primary" onclick="startNewEntry()">+ 新增素材</button>'
+      : '<button class="btn btn-primary" onclick="startNewDim()">+ 新增能力大类</button>') +
+    '</div>';
+}
+
+function renderTabs() {
+  var tabs = [{ id: 'entries', label: '素材条目' }, { id: 'skills', label: '技能画像' }];
+  var h = '<div class="tabs">';
+  tabs.forEach(function(t) {
+    h += '<button class="tab' + (activeTab === t.id ? ' active' : '') + '" onclick="switchTab(\'' + t.id + '\')">' + t.label + '</button>';
+  });
+  h += '</div>';
+  return h;
+}
+
+function switchTab(t) { activeTab = t; editingEntry = null; editingDim = null; editingSkill = null; render(); }
+
+function renderBody() {
+  if (activeTab === 'entries') return renderEntries();
+  return renderSkills();
+}
+
+// ═══ ENTRIES TAB ═══
+function renderEntries() {
+  var entries = sorted(filtered());
+  var h = '<div class="filter-row"><div class="filter-pills">';
+  ['全部', '实习', '项目'].forEach(function(f) {
+    var cnt = f === '全部' ? LIB.experiences.length : LIB.experiences.filter(function(e) { return e.type === (f === '实习' ? 'internship' : 'project'); }).length;
+    h += '<button class="filter-pill' + (entryFilter === f ? ' active' : '') + '" onclick="setFilter(\'' + f + '\')">' + f + ' (' + cnt + ')</button>';
+  });
+  h += '</div></div>';
+  if (!entries.length) return h + '<div class="empty-state">暂无素材，点击右上角「+ 新增素材」开始</div>';
+  entries.forEach(function(e) { h += renderEntryCard(e); });
+  return h;
+}
+function setFilter(f) { entryFilter = f; render(); }
+
+function renderEntryCard(e) {
+  var achievements = e.content.achievements || [];
+  var achHtml = '';
+  achievements.forEach(function(a, i) {
+    achHtml += '<div class="ach">' +
+      '<span class="ach-text"><strong>' + esc(a.label) + '：</strong>' + esc(a.text) + '</span>' +
+      '<span class="ach-actions">' +
+        '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAchievement(\'' + e.id + '\',' + i + ')">编辑</button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteAchievement(\'' + e.id + '\',' + i + ')" style="color:var(--error)">删除</button>' +
+      '</span>' +
+    '</div>';
+  });
+  var companyName = e.source.company || e.source.title || '未命名';
+  var roleWithDept = (e.type === 'internship' ? '<span class="type-badge internship">实习</span>' : '<span class="type-badge project">项目</span>') + esc(companyName);
+  if (e.source.role) roleWithDept += ' · ' + esc(e.source.role);
+
+  return '<div class="entry-card ' + (e.type === 'internship' ? 'internship' : 'project') + '" id="card-' + e.id + '">' +
+    '<div class="card-head">' +
+      '<div class="info">' +
+        '<h3>' + roleWithDept + '</h3>' +
+      '</div>' +
+      '<div class="card-right">' +
+        (e.source.period ? '<span class="period">' + esc(e.source.period) + '</span>' : '') +
+        '<div class="actions">' +
+          '<button class="btn btn-ghost btn-sm" onclick="startEditEntry(\'' + e.id + '\')">编辑</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="confirmDeleteEntry(\'' + e.id + '\')" style="color:var(--error)">删除</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ach-section">' + achHtml + '</div>' +
   '</div>';
 }
 
-function renderExperience(entry){
-  var usage=entry.usage;
-  var usedLabel=usage.timesUsed>0?'<span class="tag used">已使用 '+usage.timesUsed+' 次</span>':'<span class="tag unused">未使用</span>';
-  var hasQuant=entry.evidence&&entry.evidence.hasQuantifiedData?' · <span class="s">有量化数据</span>':'';
-  var keyMetrics=entry.evidence&&entry.evidence.keyMetrics?'<div>关键指标：'+entry.evidence.keyMetrics+'</div>':'';
-
-  var achHtml='';
-  if(entry.type==='project'){
-    achHtml=(entry.content.points||[]).map(function(p,i){return '<div class="ach-item"><span class="ach-label">Point '+(i+1)+'</span><span class="ach-text">'+escHtml(p)+'</span></div>'}).join('');
-  }else{
-    achHtml=(entry.content.achievements||[]).map(function(a){
-      return '<div class="ach-item"><span class="ach-label">'+escHtml(a.label)+'</span><span class="ach-text">'+escHtml(a.text)+'</span></div>';
-    }).join('');
-  }
-
-  var tagsHtml='';
-  (entry.tags.capability||[]).forEach(function(t){
-    tagsHtml+='<span class="tag cap">'+escHtml(t.role)+' · '+escHtml(t.dimension)+'</span>';
-  });
-  (entry.tags.industry||[]).forEach(function(i){tagsHtml+='<span class="tag ind">'+escHtml(i)+'</span>'});
-  tagsHtml+='<span class="tag lvl">'+escHtml(entry.tags.roleLevel||'')+'</span>';
-  tagsHtml+='<span class="tag own">'+escHtml(entry.tags.ownership||'')+'</span>';
-
-  var rewritesHtml='';
-  if(entry.rewrites&&entry.rewrites.length){
-    rewritesHtml='<fieldset style="margin-top:0.8rem"><legend>累积改写 ('+entry.rewrites.length+')</legend>';
-    entry.rewrites.forEach(function(r){
-      rewritesHtml+='<div class="rewrite-entry"><span class="rw-date">'+r.date+'</span> · <span class="rw-role">'+escHtml(r.targetRole||'')+'</span> — '+escHtml(r.targetJD||'')+'</div>';
+// ═══ SKILLS TAB ═══
+function renderSkills() {
+  ensureSkillDimensions();
+  var dims = LIB.skillDimensions;
+  if (!dims.length) return '<div class="empty-state">暂无技能画像，点击右上角「+ 新增能力大类」开始</div>';
+  var h = '';
+  dims.forEach(function(d) {
+    h += '<div class="dim-card">' +
+      '<div class="dim-head">' +
+        '<h3>' + esc(d.name) + ' <span style="font-weight:400;color:var(--text-secondary);font-size:.7rem">' + (d.items||[]).length + ' 项</span></h3>' +
+        '<div class="dim-actions">' +
+          '<button class="btn btn-ghost btn-sm" onclick="startEditDim(\'' + esc(d.name) + '\')">重命名</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="confirmDeleteDim(\'' + esc(d.name) + '\')" style="color:var(--error)">删除</button>' +
+        '</div>' +
+      '</div>';
+    (d.items || []).forEach(function(s, i) {
+      h += '<div class="sub-skill">' +
+        '<span class="ss-name">' + esc(s.name) + '</span>' +
+        '<span class="ss-prof prof-' + esc(s.proficiency || '') + '">' + esc(s.proficiency || '') + '</span>' +
+        '<span class="ss-desc">' + esc(s.description || '') + '</span>' +
+        '<span class="ss-actions">' +
+          '<button class="btn btn-ghost btn-sm" onclick="startEditSkill(\'' + esc(d.name) + '\',' + i + ')">编辑</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="deleteSkill(\'' + esc(d.name) + '\',' + i + ')" style="color:var(--error)">删除</button>' +
+        '</span>' +
+      '</div>';
     });
-    rewritesHtml+='</fieldset>';
-  }
-
-  return '<div class="card" id="card-'+entry.id+'">'+
-    '<div class="card-header" onclick="toggleCard(\''+entry.id+'\')">'+
-      '<span><span class="title">'+escHtml(entry.source.company||entry.source.title)+'</span> · <span style="color:var(--faded);font-size:0.82rem">'+escHtml(entry.source.role||entry.source.title||'')+'</span></span>'+
-      '<span class="meta">'+escHtml(entry.source.period||'')+' · '+usedLabel+'</span>'+
-    '</div>'+
-    '<div class="card-body">'+
-      '<div><strong>ID:</strong> '+entry.id+' · <strong>类型:</strong> '+(entry.type==='project'?'项目':'实习')+' · <strong>证据强度:</strong> '+(entry.evidence?entry.evidence.strength:'')+hasQuant+'</div>'+
-      keyMetrics+
-      '<div style="margin-top:0.4rem">'+achHtml+'</div>'+
-      '<div class="tags-row">'+tagsHtml+'</div>'+
-      (entry.notes?'<div style="margin-top:0.4rem;font-size:0.78rem;color:var(--faded)">📝 '+escHtml(entry.notes)+'</div>':'')+
-      rewritesHtml+
-    '</div>'+
-  '</div>';
-}
-
-function renderSkills(){
-  var html='<h3 style="margin:1rem 0 0.5rem;font-size:0.95rem">专业技能</h3>';
-  LIB.skills.forEach(function(s){
-    var refs=(s.evidenceRefs||[]).join(', ');
-    html+='<div class="skill-row"><span class="sk-label">'+escHtml(s.label)+'</span><span class="sk-text">'+escHtml(s.text)+'</span><span class="sk-pro">'+escHtml(s.proficiency)+'</span></div>';
-    html+='<div style="font-size:0.7rem;color:var(--faded);margin:-0.2rem 0 0.3rem 68px">证据引用：'+(refs||'无')+' · 归属：'+escHtml(s.category||'')+'</div>';
+    h += '<button class="dim-add-btn" onclick="startNewSkill(\'' + esc(d.name) + '\')">+ 新增子技能</button>';
+    h += '</div>';
   });
-  return html;
+  return h;
 }
 
-function renderMain(){
-  var ids=catEntries(activeCategory);
-  var entries=ids.map(expById).filter(Boolean);
-  var html=renderStats();
-  html+='<div class="cards">';
-  entries.forEach(function(e){html+=renderExperience(e)});
-  html+='</div>';
-  if(entries.length===0)html+='<div class="empty-state"><h3>'+activeCategory+' 为空</h3><p>该大类暂无经历。通过 AI 入库或手动添加来填充。</p></div>';
-  html+=renderSkills();
-  document.getElementById('main').innerHTML=html;
+// ═══ ENTRY EDITOR OVERLAY ═══
+function startNewEntry() {
+  editingEntry = {
+    id: genId(),
+    type: 'internship',
+    source: { company: '', role: '', period: '' },
+    content: { achievements: [{ label: '', text: '' }] }
+  };
+  render();
 }
-
-function toggleCard(id){
-  var card=document.getElementById('card-'+id);
-  if(card)card.classList.toggle('open');
+function startEditEntry(id) {
+  var e = LIB.experiences.find(function(x) { return x.id === id; });
+  if (!e) return;
+  editingEntry = JSON.parse(JSON.stringify(e));
+  if (!editingEntry.content.achievements || !editingEntry.content.achievements.length) editingEntry.content.achievements = [{ label: '', text: '' }];
+  render();
 }
+function closeEditor() { editingEntry = null; removeOverlays(); render(); }
+function removeOverlays() { var ovs = document.querySelectorAll('.overlay'); for (var i = 0; i < ovs.length; i++) ovs[i].remove(); }
 
-function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function renderEntryEditor() {
+  var e = editingEntry;
+  var isNew = !LIB.experiences.some(function(x) { return x.id === e.id; });
+  var ov = document.createElement('div');
+  ov.className = 'overlay';
+  ov.onclick = function(ev) { if (ev.target === ov) closeEditor(); };
 
-// ═══════════════════════════════════════
-// 保存逻辑 — File System Access API
-// ═══════════════════════════════════════
+  var h = '<div class="overlay-panel"><h2>' + (isNew ? '新增素材' : '编辑素材') + '</h2>';
 
-async function saveLibrary(){
-  var status=document.getElementById('save-status');
-  // Serialize updated data back to JSON
-  var dataEl=document.getElementById('library-data');
-  var updated=JSON.stringify(LIB,null,2);
-  var fullHtml=document.documentElement.outerHTML.replace(
-    /(<script[^>]*id="library-data"[^>]*>)[\s\S]*?(<\/script>)/,
-    '$1\n'+updated+'\n$2'
-  );
-  status.textContent='正在保存...';
+  // Type
+  h += '<div class="form-group"><label>类型</label><select id="ef-type" onchange="onEntryTypeChange()">' +
+    '<option value="internship"' + (e.type==='internship'?' selected':'') + '>实习</option>' +
+    '<option value="project"' + (e.type==='project'?' selected':'') + '>项目</option>' +
+    '</select></div>';
 
-  try{
-    // Try File System Access API
-    var handle=await window.showOpenFilePicker({types:[{description:'HTML files',accept:{'text/html':['.html']}}],multiple:false});
-    var fileHandle=handle[0];
-    var writable=await fileHandle.createWritable();
-    await writable.write(fullHtml);
-    await writable.close();
-    status.textContent='已保存 ✓';
-    setTimeout(function(){status.textContent=''},3000);
-  }catch(e){
-    if(e.name==='AbortError'){
-      // User cancelled file picker — fall back to download
-      var blob=new Blob([fullHtml],{type:'text/html'});
-      var url=URL.createObjectURL(blob);
-      var a=document.createElement('a');a.href=url;a.download='library.html';
-      document.body.appendChild(a);a.click();document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      status.textContent='已下载 ✓ （浏览器不支持直接写入，请替换原文件）';
-    }else{
-      status.textContent='保存失败：'+e.message;
-    }
+  // Company / Project title
+  h += '<div class="form-group"><label>' + (e.type==='project'?'项目名称':'公司') + '</label>' +
+    '<input id="ef-company" value="' + esc(e.type==='project'?(e.source.title||''):(e.source.company||'')) + '" placeholder="' + (e.type==='project'?'项目名称':'公司名') + '"></div>';
+
+  // Role
+  h += '<div class="form-group"><label>岗位</label>' +
+    '<input id="ef-role" value="' + esc(e.source.role||'') + '" placeholder="岗位名"></div>';
+
+  // Period
+  h += '<div class="form-group"><label>时间段</label>' +
+    '<input id="ef-period" value="' + esc(e.source.period||'') + '" placeholder="如 2025.08-2025.11"></div>';
+
+  // Achievements — unified vertical layout
+  h += '<div class="form-group"><label>Achievements</label>';
+  var achs = e.content.achievements || [{ label: '', text: '' }];
+  achs.forEach(function(a, i) {
+    h += '<div class="ach-edit-block">' +
+      '<div class="ach-edit-hd">' +
+        '<span style="font-size:.72rem;color:var(--text-secondary);font-weight:600">#' + (i+1) + '</span>' +
+        (achs.length > 1 ? '<button class="btn btn-ghost btn-sm" onclick="removeAchievement(' + i + ')" style="color:var(--error)">删除</button>' : '') +
+      '</div>' +
+      '<input id="ef-alabel-' + i + '" value="' + esc(a.label||'') + '" placeholder="成果标签（5-12字）" style="margin-bottom:.3rem">' +
+      '<textarea id="ef-atext-' + i + '" placeholder="STAR 描述——情况 → 任务 → 动作 → 结果（含量化数据）" style="min-height:80px">' + esc(a.text||'') + '</textarea>' +
+    '</div>';
+  });
+  h += '</div>';
+	  h += '<button class="ach-add-btn" onclick="addAchievement()">+ 新增 achievement</button>';
+
+  h += '<div class="form-actions">' +
+    '<button class="btn btn-ghost" onclick="closeEditor()">取消</button>' +
+    '<button class="btn btn-primary" onclick="saveEntry()">保存</button>' +
+  '</div></div>';
+
+  ov.innerHTML = h;
+  document.body.appendChild(ov);
+  // Auto-resize textareas to show full content
+  var tas = ov.querySelectorAll('textarea');
+  for (var ti = 0; ti < tas.length; ti++) {
+    (function(ta) {
+      ta.style.height = 'auto';
+      ta.style.height = (ta.scrollHeight + 2) + 'px';
+      ta.addEventListener('input', function() {
+        ta.style.height = 'auto';
+        ta.style.height = (ta.scrollHeight + 2) + 'px';
+      });
+    })(tas[ti]);
   }
 }
+
+function onEntryTypeChange() {
+  var sel = document.getElementById('ef-type');
+  editingEntry.type = sel.value;
+  if (!editingEntry.content.achievements) editingEntry.content.achievements = [{ label: '', text: '' }];
+  closeEditor();
+  render();
+  renderEntryEditor();
+}
+function addAchievement() {
+  editingEntry.content.achievements.push({ label: '', text: '' });
+  removeOverlays(); renderEntryEditor();
+}
+function removeAchievement(i) {
+  editingEntry.content.achievements.splice(i, 1);
+  removeOverlays(); renderEntryEditor();
+}
+
+function saveEntry() {
+  var e = editingEntry;
+  e.type = document.getElementById('ef-type').value;
+  var compVal = document.getElementById('ef-company').value.trim();
+  // Unified: both internships and projects use source.title/company for display
+  if (e.type === 'project') { e.source.title = compVal; }
+  else { e.source.company = compVal; }
+  e.source.role = document.getElementById('ef-role').value.trim();
+  e.source.period = document.getElementById('ef-period').value.trim();
+
+  // Unified achievements
+  var achs = [];
+  var ai = 0;
+  while (document.getElementById('ef-alabel-' + ai)) {
+    var al = document.getElementById('ef-alabel-' + ai).value.trim();
+    var at = document.getElementById('ef-atext-' + ai).value.trim();
+    if (al || at) achs.push({ label: al, text: at });
+    ai++;
+  }
+  e.content.achievements = achs.length ? achs : [{ label: '', text: '' }];
+  delete e.content.points;
+
+  // Upsert
+  var idx = LIB.experiences.findIndex(function(x) { return x.id === e.id; });
+  if (idx >= 0) LIB.experiences[idx] = e;
+  else LIB.experiences.push(e);
+
+  var savedId = e.id;
+  editingEntry = null;
+  render();
+  // Flash the saved card
+  var card = document.getElementById('card-' + savedId);
+  if (card) { card.classList.add('flash'); setTimeout(function() { card.classList.remove('flash'); }, 1500); }
+}
+
+// ═══ Inline achievement edit ═══
+function editAchievement(entryId, achIdx) {
+  var original = LIB.experiences.find(function(x) { return x.id === entryId; });
+  if (!original) return;
+  // Clone first, then append empty achievement if needed — never mutate original
+  editingEntry = JSON.parse(JSON.stringify(original));
+  if (!editingEntry.content.achievements) editingEntry.content.achievements = [];
+  if (achIdx >= editingEntry.content.achievements.length) {
+    editingEntry.content.achievements.push({ label: '', text: '' });
+  }
+  render();
+  renderEntryEditor();
+}
+function deleteAchievement(entryId, achIdx) {
+  var e = LIB.experiences.find(function(x) { return x.id === entryId; });
+  if (!e) return;
+  var achs = e.content.achievements || [];
+  if (achs.length <= 1) return;
+  deleteConfirm = { type: 'achievement', entryId: entryId, achIdx: achIdx };
+  render();
+}
+
+// ═══ Delete confirm ═══
+function confirmDeleteEntry(id) { deleteConfirm = { type: 'entry', id: id }; render(); }
+function confirmDeleteDim(name) { deleteConfirm = { type: 'dim', name: name }; render(); }
+function cancelDelete() { deleteConfirm = null; render(); }
+function executeDelete() {
+  if (!deleteConfirm) return;
+  if (deleteConfirm.type === 'entry') {
+    LIB.experiences = LIB.experiences.filter(function(e) { return e.id !== deleteConfirm.id; });
+  } else if (deleteConfirm.type === 'dim') {
+    LIB.skillDimensions = LIB.skillDimensions.filter(function(d) { return d.name !== deleteConfirm.name; });
+  } else if (deleteConfirm.type === 'achievement') {
+    var e = LIB.experiences.find(function(x) { return x.id === deleteConfirm.entryId; });
+    if (e && e.content.achievements) e.content.achievements.splice(deleteConfirm.achIdx, 1);
+  }
+  deleteConfirm = null;
+  render();
+}
+function renderDeleteConfirm() {
+  var ov = document.createElement('div');
+  ov.className = 'overlay';
+  ov.innerHTML = '<div class="overlay-panel" style="max-width:320px"><p style="font-size:.85rem;margin-bottom:1rem">确定删除？此操作不可撤销。</p>' +
+    '<div class="form-actions"><button class="btn btn-ghost" onclick="cancelDelete()">取消</button><button class="btn btn-danger" onclick="executeDelete()">删除</button></div></div>';
+  document.body.appendChild(ov);
+}
+
+// ═══ Skill editors ═══
+function startNewDim() {
+  editingDim = { name: '', items: [] };
+  editingSkill = null;
+  render();
+}
+function startEditDim(dimName) {
+  var d = LIB.skillDimensions.find(function(x) { return x.name === dimName; });
+  if (!d) return;
+  editingDim = JSON.parse(JSON.stringify(d));
+  editingSkill = null;
+  render();
+}
+function startNewSkill(dimName) {
+  editingSkill = { dimName: dimName, idx: -1, skill: { name: '', proficiency: '熟悉', description: '' } };
+  editingDim = null;
+  render();
+}
+function startEditSkill(dimName, idx) {
+  var d = LIB.skillDimensions.find(function(x) { return x.name === dimName; });
+  if (!d || !d.items[idx]) return;
+  editingSkill = { dimName: dimName, idx: idx, skill: JSON.parse(JSON.stringify(d.items[idx])) };
+  editingDim = null;
+  render();
+}
+function deleteSkill(dimName, idx) {
+  var d = LIB.skillDimensions.find(function(x) { return x.name === dimName; });
+  if (!d) return;
+  d.items.splice(idx, 1);
+  render();
+}
+function closeSkillEditor() { editingDim = null; editingSkill = null; removeOverlays(); render(); }
+
+function renderSkillEditor() {
+  var ov = document.createElement('div');
+  ov.className = 'overlay';
+  ov.onclick = function(ev) { if (ev.target === ov) closeSkillEditor(); };
+
+  var h = '<div class="overlay-panel" style="max-width:480px">';
+  if (editingDim !== null) {
+    var isNewDim = !LIB.skillDimensions.some(function(d) { return d.name === editingDim.name; });
+    h += '<h2>' + (isNewDim ? '新增能力大类' : '重命名能力大类') + '</h2>';
+    h += '<div class="form-group"><label>能力大类名称</label><input id="sk-dim-name" value="' + esc(editingDim.name||'') + '" placeholder="如 数据分析能力"></div>';
+    h += '<div class="form-actions">' +
+      '<button class="btn btn-ghost" onclick="closeSkillEditor()">取消</button>' +
+      '<button class="btn btn-primary" onclick="saveDim()">保存</button></div>';
+  } else if (editingSkill !== null) {
+    var isNew = editingSkill.idx < 0;
+    h += '<h2>' + (isNew ? '新增子技能' : '编辑子技能') + '</h2>';
+    h += '<div class="form-group"><label>所属能力大类</label><input disabled value="' + esc(editingSkill.dimName) + '"></div>';
+    h += '<div class="form-group"><label>技能名称</label><input id="sk-name" value="' + esc(editingSkill.skill.name||'') + '" placeholder="如 SQL"></div>';
+    h += '<div class="form-group"><label>熟练度</label><select id="sk-prof">' +
+      ['了解','熟悉','熟练','精通'].map(function(p) { return '<option value="' + p + '"' + (editingSkill.skill.proficiency===p?' selected':'') + '>' + p + '</option>'; }).join('') +
+      '</select></div>';
+    h += '<div class="form-group"><label>描述</label><textarea id="sk-desc" placeholder="应用场景或能力说明">' + esc(editingSkill.skill.description||'') + '</textarea></div>';
+    h += '<div class="form-actions">' +
+      '<button class="btn btn-ghost" onclick="closeSkillEditor()">取消</button>' +
+      '<button class="btn btn-primary" onclick="saveSkill()">保存</button></div>';
+  }
+  h += '</div>';
+  ov.innerHTML = h;
+  document.body.appendChild(ov);
+}
+
+function saveDim() {
+  ensureSkillDimensions();
+  var name = document.getElementById('sk-dim-name').value.trim();
+  if (!name) return;
+  if (editingDim.name && editingDim.name !== name) {
+    // Rename: update existing
+    var d = LIB.skillDimensions.find(function(x) { return x.name === editingDim.name; });
+    if (d) d.name = name;
+  } else if (!editingDim.name) {
+    // New: add
+    if (LIB.skillDimensions.some(function(d) { return d.name === name; })) return; // duplicate
+    LIB.skillDimensions.push({ name: name, items: [] });
+  }
+  editingDim = null;
+  render();
+}
+function saveSkill() {
+  ensureSkillDimensions();
+  var dim = LIB.skillDimensions.find(function(d) { return d.name === editingSkill.dimName; });
+  if (!dim) return;
+  var s = {
+    name: document.getElementById('sk-name').value.trim(),
+    proficiency: document.getElementById('sk-prof').value,
+    description: document.getElementById('sk-desc').value.trim()
+  };
+  if (!s.name) return;
+  if (editingSkill.idx >= 0) {
+    dim.items[editingSkill.idx] = s;
+  } else {
+    if (dim.items.some(function(x) { return x.name === s.name; })) return; // duplicate
+    dim.items.push(s);
+  }
+  editingSkill = null;
+  render();
+}
+
+// ═══ Init ═══
+render();
+
 </script>
-</body></html>
+</body>
+</html>
