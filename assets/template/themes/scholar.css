@@ -26,6 +26,7 @@ body {
 /* ---- A4 Page ---- */
 .resume-page {
 	overflow: hidden;
+background: #ffffff;
 	line-height: 1.45;
 }
 
@@ -258,26 +259,6 @@ body {
 }
 
 .achievement-list strong {
-	font-weight: 700;
-}
-
-.project-points {
-	gap: 1.2mm;
-	padding-left: 4mm;
-	font-size: 9pt;
-	line-height: 1.45;
-}
-
-.project-points li {
-	list-style-type: circle;
-	margin: 0;
-}
-
-.project-points li + li {
-	margin-top: 0;
-}
-
-.project-points strong {
 	font-weight: 700;
 }
 

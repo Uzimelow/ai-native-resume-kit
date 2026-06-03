@@ -1,6 +1,6 @@
 ---
 name: ai-native-resume-kit
-description: "AI-native resume toolkit. TRIGGER whenever the user mentions their resume, CV, JD, job application, 简历, 岗位匹配, 定制简历, 润色, 诊断报告, 匹配度, 打招呼话术, 导出PDF, 素材库, resume-data.js, HTML template, or A4 fit — even in passing. Core: (1) PDF/DOCX → structured HTML resume, (2) resume-JD evaluation with brutal diagnostic report, (3) STAR polish with quantified data, (4) JD-tailored resume with evidence matrix, (5) recruiter self-intro generation, (6) A4 PDF/PNG export. Also: material library save/match, theme switch, chained workflows. If the user has resume files or mentions any resume task in Chinese or English, consult this skill."
+description: "AI-native resume toolkit. TRIGGER when the user mentions their resume, CV, JD, job application, 简历, 岗位匹配, 定制简历, 润色, 诊断报告, 匹配度, 招呼, 导出PDF, 素材库, resume-data.js, or A4 fit. Core: (1) PDF/DOCX → structured HTML resume, (2) resume-JD evaluation with enemy-persona diagnostic report, (3) STAR polish with quantified data, (4) JD-tailored resume with evidence matrix, (5) recruiter self-intro generation, (6) A4 PDF/PNG export. Also: material library save/match, role profiles, theme switch, chained workflows."
 allowed-tools: Read Write Bash Edit Grep Glob WebFetch
 ---
 
@@ -16,51 +16,62 @@ A complete pipeline for AI-native resume management: convert raw resumes into st
 |------|---------|
 | `index.html` | A4 resume page with control panel |
 | `resume-data.js` | Structured resume data — the single edit target |
-| `script.js` | Rendering, avatar upload, PDF print, image capture, theme switch, A4 fit indicator |
-| `report-template.html` | Report base template for evaluation reports |
-| `self-intro-template.html` | Self-intro base template (5-paragraph, Charter/Georgia, ink/surface) |
-| `references/skill-taxonomy.md` | 技能分类与推断字典 — 用于拆分用户能力、推断相关技能、生成应用场景描述 |
-| `themes/default.css` | 经典海蓝: 海军蓝+暖白、宋体排版 |
-| `themes/scholar.css` | 简约黑白: serif 字体、实线标题分隔、空心圆点列表 |
+| `script.js` | Rendering, export, theme switch, A4 fit indicator |
+| `report-template.html` | Evaluation report base |
+| `self-intro-template.html` | Self-intro base (5-paragraph, Charter/Georgia) |
+| `themes/default.css` | 经典海蓝 |
+| `themes/scholar.css` | 简约黑白 |
+| `references/role-competency-library.md` | 岗位能力模型库（36 类） |
+| `references/skill-taxonomy.md` | 技能分类与推断字典 |
 
-### Built-in Template Features
+Built-in: avatar upload (localStorage), A4 PDF print, PNG capture (html2canvas, 2x), theme switch, live A4 fit indicator.
 
-- Avatar upload (localStorage persistence, scoped per-directory)
-- Print / Export A4 PDF via browser print dialog
-- Save as image + copy to clipboard (html2canvas + Clipboard API, 2x PNG)
-- Theme switcher (经典海蓝 / 简约黑白)
-- A4 fit indicator (live bottom-whitespace display)
-- Responsive control panel, print CSS (hides panel, renders A4 at exact size)
+## Routing（路由决策）
 
-## Path Selection Logic
+Detect the user's starting point and route to the correct workflow. Each chain suggests the next natural step after completion.
 
-When the user mentions their resume, apply these rules in order to determine the path:
+### 起点 1: 用户上传了 PDF/DOCX 简历
 
-1. User says "从素材库定制" / "素材库匹配" → **Path D** (library matching)
-2. User says "存入素材库" / "入库" → **Save to Material Library**
-3. User says "评估" / "诊断" + JD present → **Resume Evaluation**
-4. `material-library/library.html` exists AND user asks for JD tailoring but didn't specify a path → **suggest Path D**, fall back to Path B/C if user declines
-5. User uploads PDF/DOCX for the first time → **HTMLization first**, then suggest: (a) save to library, or (b) evaluate match if JD is also present
-6. User has existing resume-data.js but no library → suggest **Save to Material Library** after any edit
-7. User says "润色" / "polish" → **Resume Polishing**
-8. User says "招呼" / "self-intro" → **Self-Introduction**
-9. User says "导出" / "export" → **Export**
+```
+PDF/DOCX → HTML化 → 建议入库
+                  → 有 JD？→ 评估（可选）→ 定制 → 导出 / 招呼
+```
+Trigger: user attaches a `.pdf`/`.docx` file and mentions 简历/HTML化.
 
-If none of the above apply, ask the user what they want to do. Suggest the three main paths (A: one-shot / B: build library / C: light edit).
+### 起点 2: 用户有 JD，素材库已有数据
 
-## Workflow Selection
+```
+JD + library-data.json 存在 → 从素材库定制 (Path D) → 导出 / 招呼 / 回存画像
+```
+Trigger: user sends a JD and `material-library/library-data.json` exists. Proactively suggest Path D. If user declines, fall back to Path B/C.
 
-| User says | Workflow |
-|---|---|
-| "把这份PDF简历HTML化" / "convert my resume to HTML" | Resume HTMLization |
-| "存入素材库" / "入库" / "save to library" | Save to Material Library |
-| "评估简历匹配度" / "evaluate my resume" | Resume Evaluation |
-| "帮我润色简历" / "polish my resume" | Resume Polishing |
-| "根据JD定制简历" / "tailor for this role" | JD Tailoring |
-| "从素材库定制" / "素材库匹配" / "tailor from library" | JD Tailoring → Path D |
-| "生成打招呼话术" / "write a self-intro" | Self-Introduction |
-| "查看素材库" / "管理素材库" / "manage library" | Material Library Management |
-| "导出PDF" / "保存图片" / "export" | Export |
+### 起点 3: 用户已有 HTML 简历（resume-data.js 已存在）
+
+| 用户说 | → 执行 | 完成后建议 |
+|--------|-------|-----------|
+| "润色" | Resume Polishing | "有 JD 可以进一步定制" |
+| "评估" + JD | Resume Evaluation | "直接根据这份评估定制一版简历？" |
+| "定制" + JD | JD Tailoring (Path A/B/C) | "导出 PDF？需要打招呼话术吗？" |
+| "从素材库定制" + JD | JD Tailoring → Path D | "导出 PDF？需要回存到素材库吗？" |
+| "招呼" + JD | Self-Introduction | "需要导出最终版 PDF 吗？" |
+| "导出" | Export | - |
+
+### 起点 4: 用户无简历无文件
+
+Ask what they have. Suggest:
+- 「有 PDF/DOCX 吗？我可以帮你 HTML 化」
+- 「有 JD 吗？如果素材库有数据，可以直接从素材库定制」
+
+### 素材库独立操作
+
+| 用户说 | → 执行 |
+|--------|-------|
+| "入库" / "save to library" | Save to Material Library |
+| "查看素材库" / "管理素材库" | Material Library Management |
+
+### "全套"模式
+
+If user says "全套", execute sequentially: HTML化(if needed) → 入库 → 评估 → 定制 → 招呼 → 导出. Pause at each Preview step for confirmation.
 
 ## Template Isolation (ALL workflows)
 
@@ -96,14 +107,14 @@ Store all experiences from a `resume-data.js` into the persistent material libra
 **Prerequisites:** `resume-data.js` must exist (from HTMLization or existing output directory).
 
 1. Read the source `resume-data.js`.
-2. Check if `material-library/library.html` exists:
-   - If not, initialize from the repo template. Fill `profile.basics` and `profile.education` from the source.
-   - If exists, read the `<script id="library-data">` block and parse as JSON.
+2. Check if `material-library/library-data.json` exists:
+   - If not, initialize from the repo template (`library-data.json`). Fill `profile.basics` and `profile.education` from the source.
+   - If exists, read and parse the JSON file directly.
 3. For each internship and project, read `references/role-competency-library.md` to understand the target role's dimensions — this context helps the AI write richer achievement descriptions, but no formal tags are stored.
 4. Assign unique `id` (exp-NNN / proj-NNN). Append to `experiences[]`. Projects and internships share the unified `content.achievements[{label, text}]` format.
 5. For skills: read `references/skill-taxonomy.md`. Split each skill into `skillDimensions[{name, items[{name, proficiency, description}]]}`. Store in `skillDimensions[]`.
-6. Serialize the updated data back into `<script id="library-data">`. Update `meta.lastModified`. Write the full `library.html` file.
-7. Validate the JSON in the script block.
+6. Serialize the updated data to JSON. Update `meta.lastModified`. Write to `library-data.json`.
+7. Validate the JSON is valid.
 8. Report: "已入库 N 条经历, M 个能力大类。"
 
 **Achievement-level dedup:** For each new achievement within the SAME entry, AI judges semantic similarity. >80% similar → ask user: replace / keep both / discard. Cross-entry duplication is allowed (same skill in different companies is different context).
@@ -135,54 +146,24 @@ Rules of engagement:
 
 This persona's tone WINS over any formatting directive. The report structure defines WHAT; the persona defines HOW. The final tone must feel like an enemy wrote it.
 
-### Evaluation Steps
+### ⚠️ PRE-GENERATION CHECKLIST (MANDATORY — verify BEFORE writing jd-match-report.html)
 
-**1. JD 六维解析:**
+Before generating the report, confirm ALL items are planned. Generate nothing until every item is accounted for:
 
-| 维度 | 说明 |
-|:---|:---|
-| 核心职责 | 岗位到底要做什么 (3-5 条) |
-| 硬性条件 | 学历/年限/技能，不满足就致命 |
-| 加分能力 | 有则更好，无不致命 |
-| 隐含偏好 | JD 未写但行业默认的期待 |
-| ATS 关键词 | 会被机器筛选的关键词 |
-| 业务语境 | ToB/ToC、成熟期/成长期、团队规模 |
-
-**2. 岗位模型匹配:** Look up competency model in `references/role-competency-library.md`. If not found, extract 3-4 dimensions from JD and mark 「AI 提取，建议人工复核」. Never default to PM model for non-PM roles.
-
-**3. 简历证据抽取:** Parse `resume-data.js` into evidence points.
-
-**4. 证据矩阵:** Map every JD requirement to resume evidence.
-
-**5. 三维定量评分:**
-
-| 维度 | 评级 |
-|:---|:---|
-| 硬性要求覆盖 | 满足 / 缺失 (X/N) |
-| 关键词覆盖 | 高 / 中 / 低 |
-| 证据强度 | 强 / 弱 / 无证据 |
-
-**6. 定性分级 (enemy framing):**
-
-| 分级 | 含义 | Framing |
-|:---|:---|:---|
-| Met | Direct evidence | "勉强达标" |
-| Weak | Missing scope/depth | "证据不足 — 面试官不会买账" |
-| Stretch | Different context | "牵强附会" |
-| Missing | No evidence | "完全缺失 — 简历里影子都没有" |
-| Unverifiable | No supporting proof | "无法验证 — 跟没写一样" |
-
-**7. 生成报告:** Read `assets/template/report-template.html` FIRST. Fill its placeholder content with findings. Keep its CSS, layout, and structure exactly as-is. Do NOT create new HTML design. The report MUST include all sections: 三维评分表 → 匹配总评 → 逐板块批判 → 整体致命硬伤 → 修改战略 → 动词校验 → 风险自检 → 待确认风险点.
-
-### ⚠️ CRITICAL: Output Format
-
-The evaluation deliverable is ALWAYS an HTML file (`jd-match-report.html`), NEVER plain chat text. After evaluation, the user should be able to open their browser and see a styled report — not scroll through a wall of text in the chat window. Read `assets/template/report-template.html` FIRST, fill its placeholders, and write the result to the output directory.
-
-### Report Rules
-
-**Structure — Two Parts:**
-- **Part 1 — Block-by-Block Critique:** Each section opens with a one-line kill shot. Every flaw quotes resume text verbatim with `>` blockquote and explains WHY it's fatal from THIS JD's perspective. Internships: max 3 flaws each. Projects: max 2 each. Overall: 3-5 fatal issues.
-- **Part 2 — Strategic Rewrite Playbook (FULL COVERAGE):** Every single internship, project, and skill gets its own critique + complete rewrite + optimization notes. No skipping, no "similar format for the rest."
+| # | Section | Requirement |
+|---|---------|-------------|
+| ☐ 1 | **Enemy persona** | Every section uses enemy tone. Zero compliments. "勉强达标" at best. Kill-shot opening sentence for each internship/project critique. |
+| ☐ 2 | **JD 六维解析** | Table with all 6 dimensions filled. |
+| ☐ 3 | **岗位模型匹配** | Name the model from role-competency-library.md, or mark 「AI 提取」. |
+| ☐ 4 | **三维评分** | 硬性要求覆盖 + 关键词覆盖 + 证据强度 — all 3 rated. |
+| ☐ 5 | **定性分级** | Each JD requirement → Met/Weak/Stretch/Missing/Unverifiable. Enemy framing per the table in step 6. |
+| ☐ 6 | **匹配总评** | Match Rating Summary table with 4-tier verdict (<30%/30-50%/50-70%/>70%). |
+| ☐ 7 | **逐板块批判 (Part 1)** | Internships: max 3 flaws each, each with `>` blockquote quoting resume text verbatim. Projects: max 2 each. Overall: 3-5 fatal issues. |
+| ☐ 8 | **重写手册 (Part 2 — FULL COVERAGE)** | Every single internship, project, and skill gets its own rewrite. No skipping, no merging. Each rewrite: STAR + quantified, `label` + `text` format, verbs match evidence level. |
+| ☐ 9 | **潜在经历挖掘** | 「你是否…」questions per competency dimension, with wording templates. If experience has zero relevance, say so honestly. |
+| ☐ 10 | **动词校验** | Check every rewritten verb against original evidence. Flag over-upgrades. |
+| ☐ 11 | **风险自检** | Auditor-mode: no fabricated data, no level inflation, no keyword-stuffing, all changes traceable. |
+| ☐ 12 | **待确认风险点** | List items where AI is unsure about the rewrite. |
 
 **Match Rating Summary:**
 
@@ -193,47 +174,36 @@ The evaluation deliverable is ALWAYS an HTML file (`jd-match-report.html`), NEVE
 | 50-70% | "能拿面试，但核心竞争力不足" |
 | >70% | "勉强能打，但别以为稳了" |
 
-**Rewrite Rules:**
-- Every criticism MUST include a concrete fix — a wording-level alternative the user can apply immediately
-- Use the STAR + quantified format: context → problem → action → result (base + delta + business value)
-- Each achievement rewrite must maintain the `label` + `text` two-field structure
-- Verbs must match evidence level (实习生: 推动/落地/沉淀/协同; 正职可适度用 主导/带领)
-- Ban subjective evaluation words (深度理解、积累了经验、学会了) — write verifiable actions + quantifiable results only
-- Write in JD-aligned language without keyword-stuffing
+**Rewrite Rules:** Every criticism must include a concrete wording-level fix. STAR + quantified format. Maintain `label` + `text` structure. Verbs match evidence level (实习生: 推动/落地/沉淀/协同). Ban subjective words (深度理解、积累了经验). Write in JD-aligned language without keyword-stuffing. Flag over-upgrades (参与→主导).
 
-**Post-Rewrite Validation (动词-证据匹配校验):** Check every rewritten verb against original evidence. Flag over-upgrades (参与→主导 without evidence). A safer verb downgrade wins over an unsupported upgrade.
+**After report**: offer to proceed directly to JD Tailoring. If library exists, mention Path D.
 
-**Risk Self-Check (风险自检):** After generating the rewrite, switch to auditor role and verify: no fabricated data, no level inflation, no keyword-stuffing, no template-style openings ("负责…"), verb-level match, all changes traceable to source.
+### Evaluation Steps
 
-**Final output:** Include a brief "待确认风险点" section listing items where the AI is unsure about the rewrite.
+**1. JD 六维解析:** 核心职责(3-5条) / 硬性条件 / 加分能力 / 隐含偏好 / ATS关键词 / 业务语境(ToB/ToC/成熟期)
 
-### 潜在经历挖掘 (附加模块)
+**2. 岗位模型匹配:** Look up in `references/role-competency-library.md`. Not found → extract 3-4 dimensions, mark 「AI 提取」. Never default to PM model for non-PM roles.
 
-Inserted after internship rewrites, before project processing. Principle: **guide the user to recall things they may have done but didn't write — not invent.**
+**3. 证据矩阵:** Parse `resume-data.js` → map every JD requirement to resume evidence.
 
-Format: 「你是否…」questions derived from the role's competency dimensions, each followed by a wording template. If an experience has zero relevance to the target role, say so honestly instead of forcing it.
+**4. 三维评分 + 定性分级:** Score on 硬性要求覆盖(满足/缺失) + 关键词覆盖(高/中/低) + 证据强度(强/弱/无). Then grade each requirement: Met("勉强达标") / Weak("证据不足") / Stretch("牵强附会") / Missing("完全缺失") / Unverifiable("无法验证").
 
-Example:
-- [ ] 你是否参与过需求讨论？→ 可写为"参与XX功能需求评审，提出Y条优化建议"
-- [ ] 你是否处理过用户反馈？→ 可写为"分类整理了N条用户反馈，定位X个高频痛点"
+**5. 生成报告:** Read `assets/template/report-template.html` FIRST — keep its CSS and layout exactly. Fill its placeholders. The deliverable is ALWAYS `jd-match-report.html`, NEVER plain chat text. Must include: 三维评分 → 匹配总评 → 逐板块批判(Part 1, max 3 flaws per internship, `>` blockquotes) → 重写手册(Part 2, FULL COVERAGE, every internship/project/skill) → 整体致命硬伤 → 修改战略 → 动词校验 → 风险自检 → 待确认风险点.
 
-> After evaluation: offer to proceed directly to JD Tailoring. If library exists, mention Path D as the faster option.
+**6. 潜在经历挖掘:** After internship rewrites, before projects. 「你是否…」questions per competency dimension, with wording templates. Principle: guide recall, don't invent.
+
+> After evaluation: offer JD Tailoring. If library exists, mention Path D.
 
 ## Workflow 3: Resume Polishing
 
 Improve existing resume content. Edit `resume-data.js` only — in an output copy, never the template.
 
-1. Read current `resume-data.js`.
-2. Convert vague bullets into evidence-backed impact statements.
-3. Ensure every internship has 2-3 `achievements` with `label` + `text`.
-4. Move strongest achievements to top of each section.
-5. Ensure `basics.intent` is a clear one-line positioning statement.
-6. Quantify results where original data supports it. Remove filler words.
-7. Run STAR check on every achievement: Situation clear → Task explicit → Action concrete (no 参与/协助 without detail) → Result quantified (base + delta + business value).
-8. Follow Truthfulness Rules — never fabricate.
-9. Validate JS syntax. Re-run A4 fit if needed.
+1. Read current `resume-data.js`. Ensure every internship has 2-3 `achievements`.
+2. Convert vague bullets into STAR + quantified: context → action → result (base + delta). Move strongest achievements to top.
+3. Ensure `basics.intent` is a clear one-line positioning statement. Remove filler words.
+4. Follow Truthfulness Rules. Validate JS syntax and A4 fit.
 
-> After polishing: suggest saving to library if not already there. Ask if user has a JD for further tailoring.
+> After polishing: suggest saving to library. Ask if user has a JD for tailoring.
 
 ## Workflow 4: JD Tailoring
 
@@ -245,51 +215,103 @@ Combine evaluation + polishing to create a JD-targeted resume. Four paths:
 
 **Path C — 完整套件 (默认):** Run full Evaluation first → produce `jd-match-report.html` → proceed.
 
-**Path D — 从素材库定制:** Match JD against `material-library/library.html`, select top experiences, then tailor. (Triggers when library exists AND user says "从素材库定制"/"素材库匹配", OR when library exists and user is tailoring for the first time — suggest Path D.)
+**Path D — 从素材库定制:** Match JD against `material-library/library-data.json`, select top experiences, then tailor. (Triggers when library exists AND user says "从素材库定制"/"素材库匹配", OR when library exists and user is tailoring for the first time — suggest Path D.)
 
 *If user provides PDF/DOCX, run HTMLization first, then enter the chosen path.*
 
 ### Path D — Material Library Matching & Tailoring
 
-**1. Load library:**
-   a. Read `material-library/library.html` — parse `<script id="library-data">` as JSON.
-   b. Get `profile`, all `experiences[]`, `skillDimensions[]`.
-   c. If `experiences.length < 2`, warn: "素材库条目不足（<2条），建议先入库更多经历，或使用路径 B/C。"
+**0. Role profile selection:**
+   a. Read `material-library/library-data.json` — parse as JSON.
+   b. If `experiences.length < 2`, warn: "素材库条目不足（<2条），建议先入库更多经历，或使用路径 B/C。"
+   c. Check `roleProfiles` — if non-empty, list available profiles (e.g., "默认素材 / 产品经理 / 产品运营") and ask user which to use. When a role is selected, use its achievement overrides. Experiences without an override fall back to master achievements. If empty, use master directly.
 
-**2. JD 解析:** Same 6-dimension framework + role model lookup from `references/role-competency-library.md`.
+**1. JD 解析:** Same 6-dimension framework + role model lookup from `references/role-competency-library.md`.
 
-**3. Matching algorithm — AI semantic judgment:**
-   - For each library experience, the AI reads the JD requirements + the experience's achievements and rates relevance on 0.0-1.0.
-   - Score = AI judgment. Return score + one-line Chinese rationale.
-   - Filter out scores < 0.3.
+**2. Matching algorithm — capability-first, not industry-first:**
 
-**4. Rank and present:**
+For each library experience, score on TWO dimensions:
 
-Sort by score descending. Present as a table:
+| Weight | Factor | How to compute |
+|--------|--------|----------------|
+| 80% | Capability match | Does this experience demonstrate the generic skills the JD requires? (data analysis, strategy execution, effect validation, cross-team coordination, etc.) Industry context does NOT gate this score. |
+| 20% | Industry context | How close is the business context? (e.g., e-commerce vs publishing) A mismatch lowers this weight but does not disqualify. |
+
+Key principle: **The same operational capability (funnel analysis, A/B testing, layered targeting, data-driven decision-making) is cross-industry.** Do not dismiss an experience because the industry differs. Score the capability, not the domain.
+
+Filter out total scores < 0.3.
+
+**3. Phase A — Internship matching (present first, confirm before proceeding):**
 
 ```
-### 素材库匹配结果
+### 实习经历匹配
 
-JD: [公司名-岗位名] | 识别模型: [模型名]
+JD: [公司-岗位] | 画像: [选中的 role profile]
 
-| # | 经历 | 匹配度 | 匹配理由 |
-|---|------|--------|----------|
-| 1 | exp-001 某头部互联网-产品运营 | 0.87 | 数据驱动+策略执行，直接映射JD维度 |
+| # | 经历 | 能力匹配 | 体现的能力 | 
+|---|------|---------|-----------|
+| 1 | exp-002 某公司 · 某岗位 | 0.85 | 数据分析、策略优化、效果验证、跨团队协同 |
+| 2 | exp-003 某公司 · 某岗位 | 0.68 | 漏斗搭建、A/B测试、数据驱动、分层触达 |
 | ... | ... | ... | ... |
 
-建议选择前2-3项。
+请确认：选择哪几段？排序如何？是否压缩某段（减少 achievement 条数）？
 ```
 
-**5. User confirmation:** Accept / reorder / exclude entries. User must explicitly approve before proceeding.
+User MUST approve internship selection before proceeding to projects.
+
+**4. Phase B — Project matching (separate from internships):**
+
+Same format as Phase A. Present ALL projects, each with score + capability tags. User selects which to include.
+
+**5. Phase C — Skill selection (separate from projects):**
+
+Filter `library.skillDimensions` to skills with evidence in selected experiences. Present as a flat list with proficiency levels. User confirms.
 
 **6. Assemble resume-data.js:**
 - `basics` + `education` from `library.profile`
-- `internships` from selected entries of type="internship", `projects` from type="project"
-- `skills` from `library.skillDimensions`, flattened to `skills[{label, text}]` format for the resume template
+- `internships` / `projects` from user-selected entries
+- `skills` from `library.skillDimensions`, flattened to `skills[{label, text}]` format
 
-**7. Tailor:** Preview before apply, rewrite achievements for JD alignment, self-audit, validate JS + A4 fit.
+**7. Tailor — rewrite principles:**
 
-**8. After tailoring:** Update `meta.lastModified`. Serialize data back into `library.html`.
+| Rule | Explanation |
+|------|-------------|
+| **Facts stay** | Company names, job titles, dates, and quantitative data are NOT modified. |
+| **Capability mapping, not role dressing** | Highlight the generic capability the experience demonstrates (e.g., "strategy refinement", "data-driven optimization"), NOT by pretending the job was the JD's role. Do NOT change "NSFW compliance" to "e-commerce governance." Do NOT replace the actual context. |
+| **JD keywords woven naturally** | Before rewriting: extract JD-specific terms (策略精细化, 治理准确性, 风险漏放, 指标监控, 全链路, 业务痛点, 标准迭代). During rewrite: embed these terms where they genuinely describe what was done — adjust sentence framing to surface the capability the JD cares about, not to invent new facts. The reader should recognize JD language without feeling it's keyword-stuffed. |
+| **Keyword coverage table** | After rewrite, output a table showing which JD keywords appear in which experiences. Ensures the user can see at a glance that JD requirements are covered across the resume, not concentrated in one section. |
+| **Granularity preserved** | Original has 3 achievements → rewrite produces 3 achievements. Do not merge or split. If the user finds it too detailed, they can ask to compress later. |
+| **Star + quantified format** | Context → Action → Result, with base + delta + business impact. |
+| **Verb-level honesty** | Use verbs matching actual ownership level. Never upgrade "参与" to "主导." |
+
+**8. Output directory — per job posting:**
+
+Each JD tailoring produces a new directory under `assets/`, named after the target role:
+
+```
+assets/douyin-strategy-ops/     ← per-job output
+├── index.html
+├── resume-data.js              ← tailored resume for THIS posting
+├── script.js
+└── themes/
+```
+
+`material-library/library-data.json` is global — it lives outside any single output and accumulates across all job applications.
+
+**9. Preview before apply:** Present complete before/after comparison. Every changed field, every added number with its source label. User MUST approve before writing.
+
+**10. After tailoring:** Update `meta.lastModified`. Write back to `library-data.json`.
+
+**11. Save-back to role profile:**
+
+After the user confirms the tailored resume, offer to save the rewritten achievements back to the library:
+
+| Situation | Prompt | Action |
+|-----------|--------|--------|
+| Matched an existing role (e.g., "产品运营") | "是否用本次改写更新「产品运营」画像？" | If yes: overwrite that role's achievement overrides with tailored versions. If no: skip. |
+| JD is a new role direction (e.g., "策略运营" not in library) | "是否新建「策略运营」画像并保存本次改写？" | If yes: create `roleProfiles["策略运营"]`, copy tailored achievements. If no: skip. |
+
+This makes every job application an asset — next time the same role is targeted, Step 0 selects the role and retrieves the previously-tailored version, needing only minor tweaks.
 
 ### Steps (Paths A/B/C — after path selection):
 
@@ -311,41 +333,17 @@ JD: [公司名-岗位名] | 识别模型: [模型名]
 
 ## Workflow 5: Self-Introduction Generation
 
-Generate a recruiter message (~240 Chinese characters / 5 paragraphs) for platforms like BOSS直聘, WeChat, LinkedIn. **FIRST read `assets/template/self-intro-template.html` to understand the exact design.** Keep its CSS, layout, and structure exactly as-is — only replace placeholder content with real data. Save to `self-intro.html`.
+Generate a recruiter message (~240 Chinese characters) for BOSS直聘/WeChat/LinkedIn. **FIRST read `assets/template/self-intro-template.html`** — keep its CSS and layout exactly, replace placeholders with real data. Save to `self-intro.html`.
 
-### Layout
+**5-paragraph structure:** P1 "招聘老师您好！" 姓名+学校+意向岗位 / P2 "在实习方面" 最JD相关实习 2-3条数据 / P3 "在项目上" 第二段实习+项目 / P4 "在技术能力上" 工具+cert / P5 "个人认为" 差异化标签×3 + "希望能和您进一步沟通～"
 
-**Header:** Title "BOSS直聘招呼语" + meta line (目标岗位 | 字数 | 段落数).
+**Rules:** 2 most JD-relevant internships in P2, strongest first. Side projects distinct from work in P3. Every skill claim traceable to `resume-data.js`. Differentiator: 3-part "×" label with verifiable evidence. Include data traceability table and design notes (4 items max). End with "～". Formal "您".
 
-**Five-paragraph message box** (surface background `#eeede9`):
-
-| # | Opening | Content |
-|---|---------|---------|
-| P1 | 招聘老师您好！ | 姓名 + 学校 + 意向岗位 — one sentence |
-| P2 | 在实习方面， | 最 JD-relevant 的实习 (core), 2-3 achievement highlights, data-first |
-| P3 | 在项目上， | Second internship + side projects — complementary evidence |
-| P4 | 在技术能力上， | Specific tools with evidence, certs, unique skills |
-| P5 | 个人认为 | 差异化标签 ("翻译行业理解×技术实操×产品意识") + "希望能和您进一步沟通～" |
-
-**Copy button:** "复制话术到剪贴板". Copies `innerText` of the message box with newline normalization.
-
-**Data traceability table:** Dark-header table (`background: var(--ink); color: #fff`) with 3 columns: 话术声称 | resume-data.js 溯源 | 验证 (✓). Every factual claim in the intro must have a row.
-
-**Design notes:** Bulleted list (4 items max) explaining: experience selection rationale, experience placement decisions, differentiator label decomposition, traceability guarantee.
-
-### Rules
-- Select the 2 most JD-relevant internships for P2. Place the strongest one first with full detail.
-- If a second internship is equally relevant, include it in P2. Otherwise, move it to P3 as a compressed data point.
-- Side projects go in P3 — keep them distinct from work experience to avoid misrepresenting scope.
-- Every skill claim must be traceable to `resume-data.js`. No evidence = don't write it.
-- Differentiator: 3-part label using "×" as separator. Map each part to verifiable evidence.
-- Use "您" (formal), end with "～". ~240 characters.
-
-> After self-intro: offer to export final PDF or PNG for the user's outreach flow.
+> After self-intro: offer to export final PDF/PNG.
 
 ## Workflow: Material Library Management (素材库管理)
 
-Manage the persistent material library. Read `material-library/library.html` → parse `<script id="library-data">` block as JSON → operate on the data → serialize back. Always validate JSON before writing. All data lives in a single file.
+Manage the persistent material library. Read `material-library/library-data.json` → parse as JSON → operate on the data → validate JSON → write back. Data is a standalone JSON file, decoupled from the HTML editor shell.
 
 | User says | Action |
 |-----------|--------|
@@ -354,6 +352,21 @@ Manage the persistent material library. Read `material-library/library.html` →
 | "添加经历" / "add to library" | Guided interactive: ask for company/role/period/achievements → auto-tag using role-competency-library.md → preview tags for user confirmation → append to library. |
 | "删除 exp-XXX" / "remove" | Confirm with user, then remove entry by ID from `experiences[]`. |
 | "素材库统计" / "library stats" | Show: total entries, entries per type, skill dimensions count, last modified date. |
+| "新建岗位画像" / "create role profile" | Create a new role profile (e.g., "AI产品经理", "B端运营"). Experiences initialize from master. |
+| "切换到 XX 岗位" / "switch role" | Switch active role profile. Subsequent edits save to that role's achievement overrides. |
+| "从原始复制" / "copy from master" | Copy master achievements for a specific entry into the current role profile, so they can be rewritten independently. |
+
+### Role Profiles（岗位画像）
+
+Each role profile stores achievement overrides for experiences, keyed by experience ID. Profile doesn't exist = master achievements are used. This enables the same experience to have different narrative angles for different job types, without duplicating entries. Skill dimensions are shared across all roles.
+
+```
+roleProfiles: {
+  "AI产品经理": {
+    "exp-001": [{ label: "...", text: "产品视角描述..." }]
+  }
+}
+```
 
 ## Data Editing Rules
 
@@ -370,7 +383,7 @@ window.resumeData = {
   sectionTitles: { /* keep as-is */ },
   education: [ /* { degree, school, college, major, period } */ ],
   internships: [ /* { company, role, period, achievements: [{ label, text }] } */ ],
-  projects: [ /* { title, role, period, points: [string, string] } */ ],
+  projects: [ /* { title, role, period, achievements: [{ label, text }] } */ ],
   skills: [ /* { label, text } */ ]
 };
 ```
@@ -378,7 +391,7 @@ window.resumeData = {
 Guidelines:
 - Each internship: `company`, `role`, `period` + **at least 2** achievements (2-3 total). Never let an internship appear with only 1 achievement — it makes months of work look like a single task. If compressing for space, compress the text length, not the achievement count. Each achievement covers one work activity; split mega-achievements that span multiple unrelated actions.
 - Achievement label: short tag. Achievement text: one sentence with context + action + result.
-- Projects: 2 points each — "项目背景" (context) + "关键产出" (outputs).
+- Projects: at least 2 achievements each — "项目背景" (context) + "关键产出" (outputs). Same `label` + `text` structure as internships.
 - Skills (resume `skills[]`): 3-5 items with label + text. When writing skill descriptions, consult `references/skill-taxonomy.md` to enrich with specific application scenarios.
 - Skills (library `skillDimensions[]`): Organized as capability dimensions with sub-skills. Each dimension: `{ name, items: [{ name, proficiency, description }] }`. This format is for the library editor UI — AI flattens to `skills[{label, text}]` when assembling resume-data.js.
 
@@ -392,16 +405,12 @@ The resume page is 210mm wide, min-height 297mm. Content flows naturally across 
 
 ## Export
 
-Two export paths:
-
 | Method | Format | Use Case |
 |--------|--------|----------|
-| 打印 / 导出 PDF | Vector PDF, multi-page A4, selectable text | Formal submission — browser handles pagination automatically |
-| 保存图片并复制 | 2x PNG of **first A4 page only**, flat image | Quick share via WeChat/chat — content beyond page 1 is not captured |
+| 打印 / 导出 PDF | Vector PDF, multi-page A4, selectable text | Formal submission |
+| 保存图片并复制 | 2x PNG of **first A4 page only** | Quick share via WeChat/chat |
 
-> If the fit indicator shows multiple pages, remind the user: "当前内容已超出 1 页 A4，图像保存仅针对第 1 页。建议打印导出 PDF 获取完整多页版本。"
-
-PNG text is NOT selectable — not for formal submission.
+PNG text is NOT selectable — not for formal submission. If content exceeds 1 page, remind the user to use PDF export for the full version.
 
 ## Truthfulness Rules (ALL workflows)
 
@@ -418,15 +427,3 @@ If a JD-critical requirement is missing but the candidate may plausibly have it,
 
 Enemy-mode addendum: every flaw MUST cite specific evidence (or lack thereof). If you can't point to it, it's not a real flaw — move on.
 
-## Workflow Chaining
-
-| Completed | Suggest |
-|:---|:---|
-| HTML 化 | "简历已 HTML 化。要存入素材库吗？如果你有目标岗位 JD，我可以做匹配度评估。" |
-| 入库 | "素材库已更新。有目标岗位 JD 的话我可以从素材库匹配定制。" |
-| 评估 | "要我直接根据这份评估定制一版简历吗？（如果素材库有数据，也可以试试从素材库匹配）" |
-| 润色 | "有具体 JD 的话我可以进一步定制。" |
-| 话术 | "需要我帮你导出最终版 PDF 吗？" |
-| JD 定制 / 导出 | "还有其他岗位需要定制吗？" |
-
-If user provides JD + resume but only asks for one workflow, deliver what they asked for first, then suggest the next step. If user says "全套", execute sequentially — pause at each Preview step for confirmation. If `material-library/library.html` exists, proactively suggest Path D when the user mentions JD tailoring.

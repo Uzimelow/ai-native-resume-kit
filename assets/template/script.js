@@ -154,20 +154,12 @@ function renderProjects() {
     header.append(createElement("time", "project-period", item.period));
     article.append(header);
 
-    if (item.points?.length) {
-      const list = createElement("ul", "project-points");
-      item.points.forEach((point) => {
+    if (item.achievements?.length) {
+      const list = createElement("ul", "achievement-list");
+      item.achievements.forEach((achievement) => {
         const listItem = createElement("li");
-        const match = point.match(/^([^：:]+)([：:])(.*)$/);
-
-        if (match) {
-          const [, label, colon, content] = match;
-          listItem.append(createElement("strong", "", `${label}${colon}`));
-          appendHtmlOrText(listItem, content.trimStart());
-        } else {
-          appendHtmlOrText(listItem, point);
-        }
-
+        listItem.append(createElement("strong", "", `${achievement.label}：`));
+        appendHtmlOrText(listItem, achievement.text);
         list.append(listItem);
       });
       article.append(list);
@@ -256,7 +248,7 @@ function updateA4FitIndicator() {
   const pages = Math.ceil(actualHeight / a4HeightPx);
 
   if (pages > 1) {
-    indicator.textContent = "当前内容已超出 1 页 A4（约 " + pages + " 页），图像保存仅针对第 1 页";
+    indicator.textContent = "当前内容已超出 1 页 A4";
     indicator.className = "a4-fit-indicator fit-overflow";
     return;
   }

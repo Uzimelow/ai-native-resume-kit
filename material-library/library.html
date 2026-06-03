@@ -1,6 +1,4 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
+<html lang="zh-CN"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>素材库</title>
@@ -52,6 +50,18 @@ body { font-family: var(--font-ui); color: var(--text); background: var(--surfac
 .filter-pill:hover { background: var(--hover); color: var(--text); }
 .filter-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
+/* Role bar */
+.role-bar { display: flex; align-items: center; gap: .25rem; flex-wrap: wrap; margin-bottom: .65rem; padding-bottom: .65rem; border-bottom: 1px solid var(--border-light); }
+.role-pill { font-size: .78rem; font-family: var(--font-ui); padding: .28rem .8rem; border-radius: 999px; border: 1px solid var(--border); background: none; color: var(--text-secondary); cursor: pointer; transition: all var(--fast) var(--ease-out); font-weight: 500; }
+.role-pill:hover { background: var(--hover); color: var(--text); border-color: var(--border); }
+.role-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.role-pill-add { border-style: dashed; font-weight: 400; }
+.role-pill-add:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-subtle); }
+.role-pill-group { display: inline-flex; align-items: center; }
+.role-pill-group .role-pill { border-radius: 999px 0 0 999px; }
+.role-pill-del { font-size: .7rem; padding: .28rem .5rem; border: 1px solid var(--border); border-left: none; border-radius: 0 999px 999px 0; background: none; color: var(--text-secondary); cursor: pointer; transition: all var(--fast) var(--ease-out); line-height: 1; }
+.role-pill-del:hover { color: var(--error); background: var(--error-subtle); }
+
 /* Buttons */
 .btn { font-size: .8rem; font-family: var(--font-ui); border-radius: var(--radius-sm); cursor: pointer; transition: all var(--fast) var(--ease-out); display: inline-flex; align-items: center; gap: .3rem; padding: .45rem .9rem; font-weight: 500; border: none; }
 .btn-primary { background: var(--accent); color: #fff; }
@@ -71,7 +81,7 @@ body { font-family: var(--font-ui); color: var(--text); background: var(--surfac
 .entry-card .card-head .info { flex: 1; min-width: 0; }
 .entry-card .card-head .info h3 { font-size: .95rem; font-weight: 600; line-height: 1.35; display: flex; align-items: center; gap: .4rem; }
 .entry-card .card-head .info .meta { font-size: .76rem; color: var(--text-secondary); margin-top: .15rem; }
-.type-badge { font-size: .58rem; font-weight: 600; padding: .1rem .4rem; border-radius: 999px; white-space: nowrap; flex-shrink: 0; letter-spacing: .03em; }
+.type-badge { font-size: .72rem; font-weight: 600; padding: .1rem .5rem; border-radius: 999px; white-space: nowrap; flex-shrink: 0; letter-spacing: .03em; }
 .type-badge.internship { background: oklch(55% .16 142 / .12); color: var(--success); }
 .type-badge.project { background: var(--accent-subtle); color: var(--accent); }
 .entry-card .card-head .actions { display: flex; gap: .25rem; flex-shrink: 0; }
@@ -86,7 +96,7 @@ body { font-family: var(--font-ui); color: var(--text); background: var(--surfac
 .entry-card .ach + .ach { border-top: 1px solid var(--border-light); }
 .entry-card .ach .ach-text { color: var(--text-secondary); flex: 1; }
 .entry-card .ach .ach-text strong { color: var(--text); }
-.entry-card .ach .ach-actions { display: flex; gap: .15rem; flex-shrink: 0; opacity: .45; transition: opacity var(--fast); }
+.entry-card .ach .ach-actions { display: flex; gap: .15rem; flex-shrink: 0; opacity: 0; transition: opacity 180ms var(--ease-out); }
 .entry-card .ach:hover .ach-actions { opacity: 1; }
 .ach-add { margin-top: .4rem; }
 .ach-add-btn { font-size: .82rem; color: var(--text-secondary); background: none; border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: .4rem .8rem; cursor: pointer; font-family: var(--font-ui); transition: all var(--fast); width: 100%; text-align: center; }
@@ -94,25 +104,39 @@ body { font-family: var(--font-ui); color: var(--text); background: var(--surfac
 
 /* Skill dimension card */
 .dim-card { border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1rem 1.15rem; margin-bottom: .75rem; background: var(--surface); }
-.dim-card .dim-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .55rem; }
-.dim-card .dim-head h3 { font-size: .88rem; font-weight: 600; }
+.dim-card .dim-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .55rem; cursor: pointer; user-select: none; }
+.dim-card .dim-head h3 { font-size: .88rem; font-weight: 600; display: flex; align-items: center; gap: .3rem; }
+.dim-card .dim-head .collapse-icon { font-size: .65rem; color: var(--text-secondary); transition: transform 180ms var(--ease-out); display: inline-block; }
 .dim-card .dim-head .dim-actions { display: flex; gap: .25rem; }
-.dim-card .sub-skill { display: flex; align-items: baseline; gap: .5rem; padding: .45rem .4rem; font-size: .82rem; border-radius: var(--radius-sm); }
+.dim-body { overflow: hidden; transition: max-height 200ms var(--ease-out), opacity 180ms var(--ease-out); }
+.dim-body.collapsed { max-height: 0 !important; opacity: 0; }
+.dim-card .sub-skill { display: block; padding: .45rem .4rem .5rem; font-size: .82rem; border-radius: var(--radius-sm); }
 .dim-card .sub-skill:hover { background: var(--hover); }
-.dim-card .sub-skill .ss-name { font-weight: 600; min-width: 90px; color: var(--text); }
-.dim-card .sub-skill .ss-desc { flex: 1; color: var(--text-secondary); }
-.dim-card .sub-skill .ss-prof { font-size: .68rem; font-weight: 600; padding: .1rem .45rem; border-radius: 999px; white-space: nowrap; }
-.ss-prof.prof-精通 { background: oklch(55% .16 142 / .15); color: var(--success); }
-.ss-prof.prof-熟练 { background: oklch(55% .16 142 / .1); color: var(--success); }
-.ss-prof.prof-熟悉 { background: oklch(62% .18 75 / .1); color: var(--warning); }
-.ss-prof.prof-了解 { background: oklch(50% .22 25 / .06); color: var(--error); }
-.dim-card .sub-skill .ss-actions { display: flex; gap: .15rem; flex-shrink: 0; opacity: .45; transition: opacity var(--fast); }
+.dim-card .sub-skill .ss-header { display: flex; align-items: baseline; gap: .5rem; }
+.dim-card .sub-skill .ss-name { font-weight: 600; color: var(--text); }
+.dim-card .sub-skill .ss-desc { margin-top: .18rem; color: var(--text-secondary); line-height: 1.5; }
+.dim-card .sub-skill .ss-prof { font-size: .68rem; font-weight: 600; padding: .1rem .45rem; border-radius: 999px; white-space: nowrap; flex-shrink: 0; }
+.ss-prof.prof-熟练 { background: oklch(55% .15 145 / .12); color: oklch(45% .16 140); }
+.ss-prof.prof-熟悉 { background: oklch(60% .12 75 / .1); color: oklch(50% .14 70); }
+.ss-prof.prof-了解 { background: oklch(55% .02 250 / .08); color: oklch(40% .03 250); }
+.dim-card .sub-skill .ss-actions { display: flex; gap: .15rem; flex-shrink: 0; opacity: 0; transition: opacity 180ms var(--ease-out); }
 .dim-card .sub-skill:hover .ss-actions { opacity: 1; }
 .dim-add-btn { width: 100%; text-align: center; font-size: .82rem; color: var(--text-secondary); background: none; border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: .4rem .8rem; cursor: pointer; font-family: var(--font-ui); margin-top: .5rem; transition: all var(--fast); }
 .dim-add-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-subtle); }
 
 /* Empty */
 .empty-state { text-align: center; padding: 2.5rem 1rem; color: var(--text-secondary); font-size: .8rem; }
+
+/* Onboarding */
+.onboarding { max-width: 540px; margin: 4rem auto 0; text-align: center; }
+.onboarding-title { font-size: 1.4rem; font-weight: 600; letter-spacing: -.01em; margin: 0 0 .35rem; }
+.onboarding-desc { color: var(--text-secondary); font-size: .85rem; line-height: 1.6; margin: 0 0 2rem; }
+.onboarding-card { text-align: center; background: var(--panel); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.5rem 1.8rem; margin-bottom: 1rem; }
+.onboarding-card h2 { font-size: .92rem; font-weight: 600; margin: 0 0 .4rem; }
+.onboarding-card p { color: var(--text-secondary); font-size: .82rem; line-height: 1.6; margin: 0 0 1rem; }
+.onboarding-card .btn { font-size: .85rem; padding: .55rem 1.4rem; }
+.onboarding-hint { font-size: .76rem; color: var(--text-secondary); }
+.onboarding-hint .btn { font-size: .76rem; padding: .2rem .5rem; vertical-align: baseline; }
 
 /* Overlay */
 .overlay { position: fixed; inset: 0; z-index: 60; background: oklch(0% 0 0 / .4); display: flex; justify-content: center; align-items: flex-start; padding-top: 8vh; overflow-y: auto; }
@@ -138,20 +162,159 @@ body { font-family: var(--font-ui); color: var(--text); background: var(--surfac
 </head>
 <body>
 
-<div class="container" id="app"></div>
+<div class="container" id="app"><div class="page-header"><h1>素材库</h1><div style="display:flex;align-items:center;gap:.5rem"><button class="btn btn-ghost btn-sm" onclick="writeToDisk()" style="color:var(--warning)" title="保存到磁盘">● 未保存</button><button class="btn btn-primary" onclick="startNewEntry()">+ 新增素材</button></div></div><div class="tabs"><button class="tab active" onclick="switchTab('entries')">素材条目</button><button class="tab" onclick="switchTab('skills')">技能画像</button></div><div class="role-bar"><button class="role-pill" onclick="switchRole(null)">全部素材</button><span class="role-pill-group"><button class="role-pill" onclick="switchRole('产品经理')">产品经理</button><button class="role-pill-del" onclick="event.stopPropagation();deleteRole('产品经理')" title="删除此岗位">×</button></span><span class="role-pill-group"><button class="role-pill active" onclick="switchRole('产品运营')">产品运营</button><button class="role-pill-del" onclick="event.stopPropagation();deleteRole('产品运营')" title="删除此岗位">×</button></span><button class="role-pill role-pill-add" onclick="createRole()">+ 新建岗位</button><span style="margin-left:auto;font-size:.72rem;color:var(--text-secondary)">编辑后保存即存入「产品运营」</span></div><div class="filter-row"><div class="filter-pills"><button class="filter-pill active" onclick="setFilter('全部')">全部 (5)</button><button class="filter-pill" onclick="setFilter('实习')">实习 (3)</button><button class="filter-pill" onclick="setFilter('项目')">项目 (2)</button></div></div><div class="entry-card internship flash" id="card-exp-001"><div class="card-head"><div class="info"><h3><span class="type-badge internship">实习</span>字节跳动-飞书 GTM-增值体验部 · ToB商业化产品运营 <span style="font-size:.64rem;color:var(--accent);font-weight:400">（岗位改写）</span></h3></div><div class="card-right"><span class="period">2025.11-2026.05</span><div class="actions"><button class="btn btn-ghost btn-sm" onclick="startEditEntry('exp-001')">编辑</button><button class="btn btn-ghost btn-sm" onclick="confirmDeleteEntry('exp-001')" style="color:var(--error)">删除</button></div></div></div><div class="ach-section"><div class="ach"><span class="ach-text"><strong>中台产品工具搭建：</strong>针对SKU认知门槛高、推荐不准的业务卡点，开展销售团队需求调研（N=15+），绘制销售决策旅程地图，独立输出产品导航平台PRD--定义「客群规模x生命周期阶段」交叉定位逻辑与一键跳转交互方案，划定MVP范围，并从0到1开发产品。方案上线后，单次决策时长降低30min，首周核心业务线渗透率达60%。</span><span class="ach-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAchievement('exp-001',0)">编辑</button><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteAchievement('exp-001',0)" style="color:var(--error)">删除</button></span></div><div class="ach"><span class="ach-text"><strong>客户分层与服务产品设计：</strong>参与服务产品增量探索，分析商业化大盘转化数据，识别腰部客户对「重交付、全包制」服务模式的轻量/按需交付诉求，协同团队设计「按需订阅式」SKU的产品方案与权益边界。上线后大盘月均订单量增加15%，TCV首月收入增长10%。</span><span class="ach-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAchievement('exp-001',1)">编辑</button><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteAchievement('exp-001',1)" style="color:var(--error)">删除</button></span></div><div class="ach"><span class="ach-text"><strong>客户落地与产品推广：</strong>负责AI工作坊等高客单价付费培训产品的客户售前对接与交付执行，累计支持20+场付费培训（履约金额超80万，客户满意度4.8/5），参训企业飞书AI功能渗透率平均提升25%。</span><span class="ach-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAchievement('exp-001',2)">编辑</button><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteAchievement('exp-001',2)" style="color:var(--error)">删除</button></span></div></div></div><div class="entry-card internship" id="card-exp-002"><div class="card-head"><div class="info"><h3><span class="type-badge internship">实习</span>作业帮-模型数据部-PolyBuzz（角色扮演类出海AI） · AI产品运营</h3></div><div class="card-right"><span class="period">2025.08-2025.11</span><div class="actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();copyFromMaster('exp-002')" title="从原始版本复制到此岗位，然后可以独立改写">从原始复制</button><button class="btn btn-ghost btn-sm" onclick="startEditEntry('exp-002')">编辑</button><button class="btn btn-ghost btn-sm" onclick="confirmDeleteEntry('exp-002')" style="color:var(--error)">删除</button></div></div></div><div class="ach-section"><div class="ach"><span class="ach-text"><strong>用户洞察与需求分析：</strong>为提升用户留存，通过SQL提取埋点及客诉全量数据，搭建「规则库关键词命中-LLM语义打标-人工抽检复筛」三级定性分析机制(周均处理2000条评论)，同步对Loveydovey等直接竞品进行NSFW策略拆解，定位「NSFW话题合规硬拦截流失」卡点，协同产品落地「柔性防御」优化策略。策略上线后，相关差评率环比降低80%、目标流失客群人均留存时长增加约35%。</span><span class="ach-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAchievement('exp-002',0)">编辑</button><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteAchievement('exp-002',0)" style="color:var(--error)">删除</button></span></div><div class="ach"><span class="ach-text"><strong>模型调优设计与数据验证：</strong>参与「NSFW话题管理」-「柔性防御路由分支」-「内容生成」模块Prompt设计，视NSFW意图计数槽位次数设定「人设拉扯」-「环境打断」-「镜头平移」3类递进式约束规则，编写动态挂载few-shot示例，并基于人工测评迭代3版Prompt以修正示例语气漏洞，标注团队内部测评OOC率降低85%，拦截后用户对话续写率提升30%。</span><span class="ach-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAchievement('exp-002',1)">编辑</button><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteAchievement('exp-002',1)" style="color:var(--error)">删除</button></span></div><div class="ach"><span class="ach-text"><strong>标注规范建设：</strong>搭建涵盖基础体验（人设一致性、记忆力）与策略表现（NSFW拦截准确度、合规度）的12维量化评分矩阵及标注SOP，通过二次加权Kappa系数（达0.7）监控标注一致性，有效消除主观偏差，标注数据稳定支持模型周级迭代。</span><span class="ach-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAchievement('exp-002',2)">编辑</button><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteAchievement('exp-002',2)" style="color:var(--error)">删除</button></span></div></div></div><div class="entry-card internship" id="card-exp-003"><div class="card-head"><div class="info"><h3><span class="type-badge internship">实习</span>生活·读书·新知三联书店-总编室（版权部） · 海外商业化运营</h3></div><div class="card-right"><span class="period">2022.07-2025.02</span><div class="actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();copyFromMaster('exp-003')" title="从原始版本复制到此岗位，然后可以独立改写">从原始复制</button><button class="btn btn-ghost btn-sm" onclick="startEditEntry('exp-003')">编辑</button><button class="btn btn-ghost btn-sm" onclick="confirmDeleteEntry('exp-003')" style="color:var(--error)">删除</button></div></div></div><div class="ach-section"><div class="ach"><span class="ach-text"><strong>客群拓展与漏斗转化：</strong>负责海外版权输出业务，搭建「潜客建库-定向触达-意向培育-签约转化」运营漏斗，建立客户业务资料库，基于其历史偏好建立标签分层触达体系，通过A/B测试优化触达话术与推介策略，渠道有效响应率提高30%，并引入目标语文本试读、限时排他权等递进权益减少中段流失，推动50+本图书版权商业变现。</span><span class="ach-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAchievement('exp-003',0)">编辑</button><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteAchievement('exp-003',0)" style="color:var(--error)">删除</button></span></div><div class="ach"><span class="ach-text"><strong>版权交易履约与中台提效：</strong>针对跨国版权贸易中合同流转慢、历史条款翻译非标的业务卡点，利用Python+CAT工具完成2W+条语料清洗与对齐，统一术语口径、实现高相似语料自动匹配与回填，缩短单笔版权商业履约周期约15%，有效支撑前端变现链路。</span><span class="ach-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAchievement('exp-003',1)">编辑</button><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteAchievement('exp-003',1)" style="color:var(--error)">删除</button></span></div></div></div><div class="entry-card project" id="card-proj-001"><div class="card-head"><div class="info"><h3><span class="type-badge project">项目</span>飞书培训交付伙伴认证系统0-1建设 · 负责人</h3></div><div class="card-right"><span class="period">2025.12-2026.02</span><div class="actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();copyFromMaster('proj-001')" title="从原始版本复制到此岗位，然后可以独立改写">从原始复制</button><button class="btn btn-ghost btn-sm" onclick="startEditEntry('proj-001')">编辑</button><button class="btn btn-ghost btn-sm" onclick="confirmDeleteEntry('proj-001')" style="color:var(--error)">删除</button></div></div></div><div class="ach-section"><div class="ach"><span class="ach-text"><strong>项目背景：</strong>传统认证模式依赖人工，低ROI重复劳动多发，视频审阅反馈滞后、考核题目时效断层、流程不透明等问题显著。</span><span class="ach-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAchievement('proj-001',0)">编辑</button><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteAchievement('proj-001',0)" style="color:var(--error)">删除</button></span></div><div class="ach"><span class="ach-text"><strong>关键产出：</strong>（1）AI智能考核体系：基于Coze搭建考核智能体，实现依据上传文档组卷、试卷分发、批改及成绩汇总全流程自动化，人工成本降低95%，并通过多维表格插件化发布实现部门快速复用；（2）认证系统全流程管理：搭建120+字段、10+仪表盘、5+工作流，实现视频审阅、信息流转及触达自动化，完成数据可视化、业务闭环，并以应用模式对外发布。</span><span class="ach-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAchievement('proj-001',1)">编辑</button><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteAchievement('proj-001',1)" style="color:var(--error)">删除</button></span></div></div></div><div class="entry-card project" id="card-proj-002"><div class="card-head"><div class="info"><h3><span class="type-badge project">项目</span>AI 驱动的简历诊断与定制Skill · side project 负责人</h3></div><div class="card-right"><span class="period">2025.05-2026.06</span><div class="actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();copyFromMaster('proj-002')" title="从原始版本复制到此岗位，然后可以独立改写">从原始复制</button><button class="btn btn-ghost btn-sm" onclick="startEditEntry('proj-002')">编辑</button><button class="btn btn-ghost btn-sm" onclick="confirmDeleteEntry('proj-002')" style="color:var(--error)">删除</button></div></div></div><div class="ach-section"><div class="ach"><span class="ach-text"><strong>用户洞察：</strong>通过20+名求职者访谈与社媒舆情分析，定位LLM意见柔化、海投场景投递效率低、简历与业务匹配度低等痛点。</span><span class="ach-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAchievement('proj-002',0)">编辑</button><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteAchievement('proj-002',0)" style="color:var(--error)">删除</button></span></div><div class="ach"><span class="ach-text"><strong>关键动作：</strong>为修正LLM礼貌偏误，引入「敌意 Persona」评估机制，并将评估产出从碎片化重估为多维评分+逐段批判+全覆盖重写的诊断报告；设计含图片等格式导出的多套HTML简历模板，提高简历的信息密度与管理、导出效率。</span><span class="ach-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAchievement('proj-002',1)">编辑</button><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteAchievement('proj-002',1)" style="color:var(--error)">删除</button></span></div><div class="ach"><span class="ach-text"><strong>闭环迭代：</strong>定义「生成简历人工编辑距离」为核心指标，依据30+份用户反馈进行「内置岗位能力模型库」等3次迭代，受访者平均编辑距离降低50%（200字符）。</span><span class="ach-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAchievement('proj-002',2)">编辑</button><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteAchievement('proj-002',2)" style="color:var(--error)">删除</button></span></div></div></div></div>
 
-<script id="library-data" type="application/json">
-{"meta":{"version":"3.0","lastModified":"2026-06-03","candidateName":"李小明"},"profile":{"basics":{"name":"李小明","intent":"求职意向：产品运营实习生","location":"上海","undergraduate":"复旦大学 新闻学院 传播学","graduate":"上海交通大学 媒体与传播学院 新闻与传播","graduationYear":"2026","email":"lixiaoming@example.com","phone":"13900001111"},"education":[{"degree":"硕士","school":"上海交通大学","college":"媒体与传播学院","major":"新闻与传播","period":"2024.09-2026.06"},{"degree":"本科","school":"复旦大学","college":"新闻学院","major":"传播学","period":"2020.09-2024.06"}]},"experiences":[{"id":"exp-001","type":"internship","source":{"company":"某头部互联网公司-内容生态部","role":"产品运营实习生","period":"2025.06-2025.09"},"content":{"achievements":[{"label":"内容供给策略优化","text":"负责短视频内容池的供给侧分析，通过SQL提取6个月消费与互动数据（样本量50W+条），识别出低互动率且高曝光的「高曝低效」内容类型4类，输出供给质量分析报告并推动汰换机制上线。优质内容曝光占比从31%提升至38%，人均消费时长从12.4min提升至14.6min，日均低质内容曝光量下降约40W次。"},{"label":"创作者激励体系搭建","text":"主导创作者激励体系的产品化设计：分析10W+创作者行为数据，按投稿频次与互动表现划分为4个等级，设计对应成长任务（新手引导→进阶挑战→高阶权益）与阶梯式流量激励。输出PRD初稿并协同研发、运营、设计团队推动上线，周活跃创作者数从8,200提升至11,100，头部创作者月流失率从18%降至6%。"},{"label":"产品工具搭建与体验优化","text":"针对SKU认知门槛高、推荐不准的业务卡点，0-1搭建内容产品导航平台，实现「内容类型×用户分层」交叉定位与一键跳转。单次运营决策时长降低30min，上线当周核心业务线渗透率达60%，人均周检索7次，信息查找效率提升显著。"}]}},{"id":"exp-002","type":"internship","source":{"company":"某快消品牌-市场部","role":"品牌营销实习生","period":"2025.02-2025.05"},"content":{"achievements":[{"label":"新品上市推广与用户增长","text":"负责新品上市的用户增长与内容触达策略：基于目标客群画像设计社交媒体种草内容矩阵，筛选50+垂类KOL并按粉丝画像分层投放，最终触达用户超500万，新品首月销售额超额20%达成目标。"},{"label":"用户洞察与竞品分析","text":"开展消费者深度访谈与问卷调研（N=200+），结合电商评论挖掘与竞品动态追踪，定位消费者核心决策因子，输出品类机会报告，驱动产品卖点提炼与包装优化，新品上市后复购率提升15个百分点。"}]}},{"id":"exp-003","type":"internship","source":{"company":"某AI初创公司-产品部","role":"AI产品实习生","period":"2024.10-2025.01"},"content":{"achievements":[{"label":"AI内容审核工作流搭建","text":"发现审核团队日均处理量瓶颈（300条/人）导致审核时效不达标，分析工作流中可自动化环节，设计LLM预审方案并撰写PRD协调工程团队落地。人工审核量从300条/人降至120条/人，审核时效从4h缩短至1.5h，内容合规风险事件发生率降低80%。"},{"label":"数据标注体系与质量标准建设","text":"为解决AI模型训练数据质量不稳定的问题，设计涵盖基础体验（一致性、记忆力）与策略表现（合规度、准确度）等12维量化评分矩阵的标注SOP。标注结果二次加权Kappa系数达0.7，数据标注一致性提升40%，模型训练效果提升12%。"}]}},{"id":"proj-001","type":"project","source":{"title":"短视频热点预测模型","role":"核心成员","period":"2025.07-2025.09"},"content":{"achievements":[{"label":"项目背景","text":"内容运营团队在热点选题上高度依赖人工经验判断，选题成功率仅35%，且响应速度落后竞品2-3小时，导致流量流失。"},{"label":"关键产出","text":"（1）构建基于历史爆款内容的12维特征指标体系，结合时序分析预测热点趋势，选题命中率从35%提升至49%；（2）搭建自动化热点监控看板，实现分钟级异动预警，响应速度缩短至30min以内。"}]}},{"id":"proj-002","type":"project","source":{"title":"AI 产品内容生态优化项目","role":"负责人","period":"2025.10-2025.12"},"content":{"achievements":[{"label":"项目背景","text":"AI对话产品在多场景下内容生成质量不稳定，用户投诉率高，且缺乏系统性的效果评估机制。"},{"label":"关键产出","text":"（1）搭建多语言平行语料库与自动化评估管线，实现内容质量的分钟级监控；（2）设计3类递进式Prompt约束规则，通过人工测评迭代3版Prompt，内容OOC率降低85%，用户对话续写率提升30%。"}]}}],"skillDimensions":[{"name":"产品技能","items":[{"name":"熟练使用Axure、","proficiency":"熟练","description":"熟练使用Axure、墨刀进行原型设计，具备PRD撰写与需求管理经验"},{"name":"熟悉Scrum开发流","proficiency":"熟练","description":"熟悉Scrum开发流程与跨团队项目协同"},{"name":"掌握用户访谈、问卷调","proficiency":"熟练","description":"掌握用户访谈、问卷调研、可用性测试等用户研究方法。"}]},{"name":"数据技能","items":[{"name":"熟练使用SQL进行日","proficiency":"熟练","description":"熟练使用SQL进行日常数据提取与分析"},{"name":"精通Excel数据透","proficiency":"熟练","description":"精通Excel数据透视表与可视化"},{"name":"具备Python基础","proficiency":"熟练","description":"具备Python基础编程与自动化脚本编写能力"},{"name":"熟悉神策、Growi","proficiency":"熟练","description":"熟悉神策、GrowingIO等数据分析平台。"}]},{"name":"AI工具","items":[{"name":"熟悉LLM应用与Pr","proficiency":"掌握","description":"熟悉LLM应用与Prompt工程，有AI辅助内容审核与内容生成质量评估的实践经验"},{"name":"掌握Claude C","proficiency":"掌握","description":"掌握Claude Code、Coze等AI开发工具的基础使用。"}]},{"name":"语言能力","items":[{"name":"CET-4、CET-","proficiency":"熟练","description":"CET-4、CET-6"},{"name":"英语读写流利，可独立","proficiency":"熟练","description":"英语读写流利，可独立完成英文文档撰写与跨文化业务沟通"},{"name":"具备中英双语内容策划","proficiency":"熟练","description":"具备中英双语内容策划与编辑能力。"}]}]}
-</script>
 
 <script>
-// ═══ Parse ═══
-var LIB;
-(function() {
-  try { LIB = JSON.parse(document.getElementById('library-data').textContent.trim()); }
-  catch(e) { document.getElementById('app').innerHTML = '<div class="empty-state">数据解析失败</div>'; throw e; }
+// ═══ Parse — load from JSON file ═══
+var LIB = null;
+
+function hasFSA() { return typeof window.showOpenFilePicker === 'function'; }
+
+// ═══ File persistence (File System Access API + IndexedDB) ═══
+var fileHandle = null;
+var dirty = false;
+
+function serializeLibrary() { return JSON.stringify(LIB, null, 2); }
+
+function idbOpen() {
+  return new Promise(function(resolve, reject) {
+    var req = indexedDB.open('material-library', 2);
+    req.onupgradeneeded = function() { req.result.createObjectStore('handles'); };
+    req.onsuccess = function() { resolve(req.result); };
+    req.onerror = function() { reject(req.error); };
+  });
+}
+
+function idbGetHandle() {
+  return idbOpen().then(function(db) {
+    return new Promise(function(resolve) {
+      var tx = db.transaction('handles', 'readonly');
+      var r = tx.objectStore('handles').get('fileHandle');
+      r.onsuccess = function() { resolve(r.result ? r.result.h : null); };
+      r.onerror = function() { resolve(null); };
+    });
+  }).catch(function() { return null; });
+}
+
+function idbSaveHandle(h) {
+  return idbOpen().then(function(db) {
+    return new Promise(function(resolve, reject) {
+      var tx = db.transaction('handles', 'readwrite');
+      tx.onerror = function() { reject(tx.error); };
+      tx.onabort = function() { reject(tx.error); };
+      tx.oncomplete = function() { resolve(); };
+      tx.objectStore('handles').put({ h: h }, 'fileHandle');
+    });
+  });
+}
+
+function idbClearHandle() {
+  return idbOpen().then(function(db) {
+    return new Promise(function(resolve) {
+      var tx = db.transaction('handles', 'readwrite');
+      tx.onerror = function() { resolve(); };
+      tx.oncomplete = function() { resolve(); };
+      tx.objectStore('handles').delete('fileHandle');
+    });
+  });
+}
+
+async function loadFromHandle(h) {
+  try {
+    var f = await h.getFile();
+    var text = await f.text();
+    LIB = JSON.parse(text);
+    if (!LIB || typeof LIB !== 'object' || !LIB.experiences || !LIB.skillDimensions) throw new Error('数据格式不正确：缺少 experiences 或 skillDimensions 字段');
+    fileHandle = h;
+    try { await idbSaveHandle(h); } catch(ee) { console.warn('Handle cache failed:', ee); }
+    dirty = false;
+    render();
+  } catch(e) {
+    console.error('Load failed:', e);
+    LIB = null;
+    fileHandle = null;
+    try { await idbClearHandle(); } catch(ee) {}
+    alert('无法加载文件：' + e.message + '\n\n请确认选择的是 library-data.json 文件。');
+    render();
+  }
+}
+
+async function openLibraryFile() {
+  try {
+    var handles = await window.showOpenFilePicker({ multiple: false });
+    if (!handles.length) return;
+    var app = document.getElementById('app');
+    if (app) app.innerHTML = '<div class=\"empty-state\">加载中...</div>';
+    await loadFromHandle(handles[0]);
+  } catch(e) {
+    if (e.name === 'AbortError') return;
+    console.error('Open failed:', e);
+    if (e.name === 'SecurityError') {
+      alert('当前页面不是安全上下文，无法使用文件选择器。\n\n解决方法：\n1. 直接用浏览器打开 library.html（file:// 协议）\n2. 或用 HTTPS 访问');
+    } else {
+      alert('打开文件失败：' + e.message);
+    }
+  }
+}
+
+async function writeToDisk() {
+  if (!fileHandle) return downloadFile();
+  try {
+    var perm = await fileHandle.queryPermission({ mode: 'readwrite' });
+    if (perm !== 'granted') {
+      perm = await fileHandle.requestPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') { alert('需要写入权限才能保存'); return; }
+    }
+    var writable = await fileHandle.createWritable();
+    await writable.write(serializeLibrary());
+    await writable.close();
+    dirty = false;
+    render();
+  } catch(e) {
+    console.error('Write failed:', e);
+    await idbClearHandle();
+    fileHandle = null;
+    alert('保存失败，文件可能已被移动。请重新打开 JSON 文件。');
+    render();
+  }
+}
+
+function downloadFile() {
+  var json = LIB ? serializeLibrary() : JSON.stringify({
+    meta: { version: '3.0', lastModified: '', candidateName: '' },
+    profile: { basics: { name: '', intent: '', location: '', undergraduate: '', graduate: '', graduationYear: '', email: '', phone: '' }, education: [] },
+    experiences: [],
+    skillDimensions: [],
+    roleProfiles: {}
+  }, null, 2);
+  var blob = new Blob([json], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'library-data.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  dirty = false;
+  render();
+}
+
+function markDirty() { dirty = true; }
+
+window.addEventListener('beforeunload', function(e) {
+  if (dirty) { e.preventDefault(); e.returnValue = ''; }
+});
+
+(function init() {
+  if (!hasFSA()) { render(); return; }
+  idbGetHandle().then(function(h) {
+    if (h) {
+      h.queryPermission({ mode: 'readwrite' }).then(function(p) {
+        if (p === 'granted') { loadFromHandle(h); }
+        else { render(); }
+      });
+    } else { render(); }
+  });
 })();
-if (!LIB) throw new Error('Parse failed');
 
 // ═══ State ═══
 var activeTab = 'entries'; // 'entries' | 'skills'
@@ -161,6 +324,54 @@ var editingAchIdx = null;  // for inline achievement editing
 var editingDim = null;     // dimension name being edited
 var editingSkill = null;   // { dimName, idx } for sub-skill being edited
 var deleteConfirm = null;
+var activeRole = null;     // null = master view, string = role profile name
+
+// ═══ Role helpers ═══
+function ensureRoleProfiles() { if (!LIB.roleProfiles) LIB.roleProfiles = {}; }
+function getRoleNames() { ensureRoleProfiles(); return Object.keys(LIB.roleProfiles); }
+function getEffectiveAchievements(entry) {
+  if (activeRole && LIB.roleProfiles && LIB.roleProfiles[activeRole] && LIB.roleProfiles[activeRole][entry.id]) {
+    return LIB.roleProfiles[activeRole][entry.id];
+  }
+  return entry.content.achievements;
+}
+function switchRole(name) { activeRole = (name === activeRole) ? null : name; render(); }
+function createRole() {
+  var name = prompt('新岗位名称（如 AI产品经理）：');
+  if (!name || !name.trim()) return;
+  name = name.trim();
+  ensureRoleProfiles();
+  if (LIB.roleProfiles[name]) { alert('岗位「' + name + '」已存在'); return; }
+  LIB.roleProfiles[name] = {};
+  // Auto-copy all master achievements to new role
+  LIB.experiences.forEach(function(e) {
+    LIB.roleProfiles[name][e.id] = JSON.parse(JSON.stringify(e.content.achievements));
+  });
+  activeRole = name;
+  markDirty();
+  render();
+  writeToDisk();
+}
+function deleteRole(name) {
+  if (!confirm('删除岗位「' + name + '」？\n经历原始版本不受影响，仅删除该岗位下的改写版本。')) return;
+  ensureRoleProfiles();
+  delete LIB.roleProfiles[name];
+  if (activeRole === name) activeRole = null;
+  markDirty();
+  render();
+  writeToDisk();
+}
+function copyFromMaster(entryId) {
+  if (!activeRole) return;
+  ensureRoleProfiles();
+  if (!LIB.roleProfiles[activeRole]) LIB.roleProfiles[activeRole] = {};
+  var entry = LIB.experiences.find(function(e) { return e.id === entryId; });
+  if (!entry) return;
+  LIB.roleProfiles[activeRole][entryId] = JSON.parse(JSON.stringify(entry.content.achievements));
+  markDirty();
+  render();
+  writeToDisk();
+}
 
 // ═══ Helpers ═══
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -194,19 +405,60 @@ function findSkillInDim(dimName, skillName) {
 
 // ═══ Render ═══
 function render() {
-  var app = document.getElementById('app');
-  app.innerHTML = renderHeader() + renderTabs() + renderBody();
-  if (deleteConfirm) renderDeleteConfirm();
-  if (editingEntry !== null) renderEntryEditor();
-  if (editingDim !== null || editingSkill !== null) renderSkillEditor();
+  try {
+    removeOverlays();
+    var app = document.getElementById('app');
+    if (!LIB) {
+      app.innerHTML = renderOnboarding();
+      return;
+    }
+    app.innerHTML = renderHeader() + renderTabs() + renderRoleBar() + renderBody();
+    if (deleteConfirm) renderDeleteConfirm();
+    if (editingEntry !== null) renderEntryEditor();
+    if (editingDim !== null || editingSkill !== null) renderSkillEditor();
+  } catch(e) {
+    console.error('Render error:', e);
+    var app = document.getElementById('app');
+    if (app) app.innerHTML = '<div class=\"empty-state\">渲染出错: ' + e.message + '</div>';
+  }
+}
+
+function renderRoleBar() {
+  if (activeTab !== 'entries') return '';
+  var roles = getRoleNames();
+  var h = '<div class="role-bar">';
+  h += '<button class="role-pill' + (activeRole === null ? ' active' : '') + '" onclick="switchRole(null)">全部素材</button>';
+  roles.forEach(function(r) {
+    h += '<span class="role-pill-group">';
+    h += '<button class="role-pill' + (activeRole === r ? ' active' : '') + '" onclick="switchRole(\'' + esc(r) + '\')">' + esc(r) + '</button>';
+    h += '<button class="role-pill-del" onclick="event.stopPropagation();deleteRole(\'' + esc(r) + '\')" title="删除此岗位">×</button>';
+    h += '</span>';
+  });
+  h += '<button class="role-pill role-pill-add" onclick="createRole()">+ 新建岗位</button>';
+  if (activeRole) {
+    h += '<span style="margin-left:auto;font-size:.72rem;color:var(--text-secondary)">编辑后保存即存入「' + esc(activeRole) + '」</span>';
+  }
+  h += '</div>';
+  return h;
 }
 
 function renderHeader() {
-  return '<div class="page-header"><h1>素材库</h1>' +
+  var saveHtml = '';
+  if (!fileHandle) {
+    saveHtml = '<button class="btn btn-ghost btn-sm" onclick="openLibraryFile()" title="选择 JSON 数据文件">打开文件</button>';
+  } else if (dirty) {
+    saveHtml = '<button class="btn btn-ghost btn-sm" onclick="writeToDisk()" style="color:var(--warning)" title="保存到磁盘">● 未保存</button>';
+  } else {
+    saveHtml = '<span style="font-size:.72rem;color:var(--success)" title="已自动保存">● 已保存</span>';
+  }
+  if (!fileHandle && typeof window.showOpenFilePicker === 'undefined') {
+    saveHtml = '<button class="btn btn-ghost btn-sm" onclick="downloadFile()" title="下载 JSON 数据文件">下载</button>';
+  }
+  return '<div class="page-header"><h1>素材库</h1><div style="display:flex;align-items:center;gap:.5rem">' + saveHtml +
     (activeTab === 'entries'
       ? '<button class="btn btn-primary" onclick="startNewEntry()">+ 新增素材</button>'
       : '<button class="btn btn-primary" onclick="startNewDim()">+ 新增能力大类</button>') +
-    '</div>';
+    '</div></div>';
 }
 
 function renderTabs() {
@@ -215,6 +467,29 @@ function renderTabs() {
   tabs.forEach(function(t) {
     h += '<button class="tab' + (activeTab === t.id ? ' active' : '') + '" onclick="switchTab(\'' + t.id + '\')">' + t.label + '</button>';
   });
+  h += '</div>';
+  return h;
+}
+
+function renderOnboarding() {
+  var h = '<div class="onboarding">';
+  h += '<h1 class="onboarding-title">素材库</h1>';
+  h += '<p class="onboarding-desc">管理简历经历与技能画像。编辑内容自动保存到本地 JSON 文件。</p>';
+  if (hasFSA()) {
+    h += '<div class="onboarding-card">';
+    h += '<h2>选择数据文件</h2>';
+    h += '<p>选中你的 <b>library-data.json</b>，之后所有编辑自动保存，无需重复操作。</p>';
+    h += '<button class="btn btn-primary" onclick="openLibraryFile()">选择文件</button>';
+    h += '</div>';
+    h += '<p class="onboarding-hint">还没有数据文件？<button class="btn btn-ghost btn-sm" onclick="downloadFile()">下载 demo</button>作为起点</p>';
+    h += '<p class="onboarding-hint" style="margin-top:.65rem">页面刷新后将返回此页面，需重新选择数据文件。</p>';
+  } else {
+    h += '<div class="onboarding-card">';
+    h += '<h2>浏览器兼容性说明</h2>';
+    h += '<p>你的浏览器不支持本地文件写入。编辑后请下载 JSON 文件并手动替换原文件。</p>';
+    h += '<button class="btn btn-primary" onclick="downloadFile()">下载 library-data.json</button>';
+    h += '</div>';
+  }
   h += '</div>';
   return h;
 }
@@ -242,7 +517,8 @@ function renderEntries() {
 function setFilter(f) { entryFilter = f; render(); }
 
 function renderEntryCard(e) {
-  var achievements = e.content.achievements || [];
+  var achievements = getEffectiveAchievements(e) || [];
+  var isRoleOverride = activeRole && LIB.roleProfiles && LIB.roleProfiles[activeRole] && LIB.roleProfiles[activeRole][e.id];
   var achHtml = '';
   achievements.forEach(function(a, i) {
     achHtml += '<div class="ach">' +
@@ -256,6 +532,12 @@ function renderEntryCard(e) {
   var companyName = e.source.company || e.source.title || '未命名';
   var roleWithDept = (e.type === 'internship' ? '<span class="type-badge internship">实习</span>' : '<span class="type-badge project">项目</span>') + esc(companyName);
   if (e.source.role) roleWithDept += ' · ' + esc(e.source.role);
+  if (isRoleOverride) roleWithDept += ' <span style="font-size:.64rem;color:var(--accent);font-weight:400">（岗位改写）</span>';
+
+  var copyBtn = '';
+  if (activeRole && !isRoleOverride) {
+    copyBtn = '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();copyFromMaster(\'' + e.id + '\')" title="从原始版本复制到此岗位，然后可以独立改写">从原始复制</button>';
+  }
 
   return '<div class="entry-card ' + (e.type === 'internship' ? 'internship' : 'project') + '" id="card-' + e.id + '">' +
     '<div class="card-head">' +
@@ -265,6 +547,7 @@ function renderEntryCard(e) {
       '<div class="card-right">' +
         (e.source.period ? '<span class="period">' + esc(e.source.period) + '</span>' : '') +
         '<div class="actions">' +
+          (copyBtn || '') +
           '<button class="btn btn-ghost btn-sm" onclick="startEditEntry(\'' + e.id + '\')">编辑</button>' +
           '<button class="btn btn-ghost btn-sm" onclick="confirmDeleteEntry(\'' + e.id + '\')" style="color:var(--error)">删除</button>' +
         '</div>' +
@@ -274,6 +557,14 @@ function renderEntryCard(e) {
   '</div>';
 }
 
+// ═══ Collapse state ═══
+var collapsedDims = {};
+
+function toggleDim(dimName) {
+  collapsedDims[dimName] = !collapsedDims[dimName];
+  render();
+}
+
 // ═══ SKILLS TAB ═══
 function renderSkills() {
   ensureSkillDimensions();
@@ -281,27 +572,32 @@ function renderSkills() {
   if (!dims.length) return '<div class="empty-state">暂无技能画像，点击右上角「+ 新增能力大类」开始</div>';
   var h = '';
   dims.forEach(function(d) {
+    var isCollapsed = collapsedDims[d.name] || false;
+    var icon = isCollapsed ? '▸' : '▾';
     h += '<div class="dim-card">' +
-      '<div class="dim-head">' +
-        '<h3>' + esc(d.name) + ' <span style="font-weight:400;color:var(--text-secondary);font-size:.7rem">' + (d.items||[]).length + ' 项</span></h3>' +
-        '<div class="dim-actions">' +
+      '<div class="dim-head" onclick="toggleDim(\'' + esc(d.name) + '\')">' +
+        '<h3><span class="collapse-icon">' + icon + '</span>' + esc(d.name) + ' <span style="font-weight:400;color:var(--text-secondary);font-size:.7rem">' + (d.items||[]).length + ' 项</span></h3>' +
+        '<div class="dim-actions" onclick="event.stopPropagation()">' +
           '<button class="btn btn-ghost btn-sm" onclick="startEditDim(\'' + esc(d.name) + '\')">重命名</button>' +
           '<button class="btn btn-ghost btn-sm" onclick="confirmDeleteDim(\'' + esc(d.name) + '\')" style="color:var(--error)">删除</button>' +
         '</div>' +
-      '</div>';
+      '</div>' +
+      '<div class="dim-body' + (isCollapsed ? ' collapsed' : '') + '">';
     (d.items || []).forEach(function(s, i) {
       h += '<div class="sub-skill">' +
-        '<span class="ss-name">' + esc(s.name) + '</span>' +
-        '<span class="ss-prof prof-' + esc(s.proficiency || '') + '">' + esc(s.proficiency || '') + '</span>' +
-        '<span class="ss-desc">' + esc(s.description || '') + '</span>' +
-        '<span class="ss-actions">' +
-          '<button class="btn btn-ghost btn-sm" onclick="startEditSkill(\'' + esc(d.name) + '\',' + i + ')">编辑</button>' +
-          '<button class="btn btn-ghost btn-sm" onclick="deleteSkill(\'' + esc(d.name) + '\',' + i + ')" style="color:var(--error)">删除</button>' +
-        '</span>' +
+        '<div class="ss-header">' +
+          '<span class="ss-name">' + esc(s.name) + '</span>' +
+          '<span class="ss-prof prof-' + esc(s.proficiency || '') + '">' + esc(s.proficiency || '') + '</span>' +
+          '<span class="ss-actions">' +
+            '<button class="btn btn-ghost btn-sm" onclick="startEditSkill(\'' + esc(d.name) + '\',' + i + ')">编辑</button>' +
+            '<button class="btn btn-ghost btn-sm" onclick="deleteSkill(\'' + esc(d.name) + '\',' + i + ')" style="color:var(--error)">删除</button>' +
+          '</span>' +
+        '</div>' +
+        '<div class="ss-desc">' + esc(s.description || '') + '</div>' +
       '</div>';
     });
     h += '<button class="dim-add-btn" onclick="startNewSkill(\'' + esc(d.name) + '\')">+ 新增子技能</button>';
-    h += '</div>';
+    h += '</div></div>';
   });
   return h;
 }
@@ -320,6 +616,11 @@ function startEditEntry(id) {
   var e = LIB.experiences.find(function(x) { return x.id === id; });
   if (!e) return;
   editingEntry = JSON.parse(JSON.stringify(e));
+  // In role mode, load role-specific achievements into the editor
+  if (activeRole) {
+    var roleAchs = getEffectiveAchievements(e);
+    editingEntry.content.achievements = JSON.parse(JSON.stringify(roleAchs));
+  }
   if (!editingEntry.content.achievements || !editingEntry.content.achievements.length) editingEntry.content.achievements = [{ label: '', text: '' }];
   render();
 }
@@ -417,7 +718,7 @@ function saveEntry() {
   e.source.role = document.getElementById('ef-role').value.trim();
   e.source.period = document.getElementById('ef-period').value.trim();
 
-  // Unified achievements
+  // Collect achievements from form
   var achs = [];
   var ai = 0;
   while (document.getElementById('ef-alabel-' + ai)) {
@@ -426,17 +727,29 @@ function saveEntry() {
     if (al || at) achs.push({ label: al, text: at });
     ai++;
   }
-  e.content.achievements = achs.length ? achs : [{ label: '', text: '' }];
-  delete e.content.points;
+  achs = achs.length ? achs : [{ label: '', text: '' }];
 
-  // Upsert
+  // Upsert master entry (shared metadata always in master)
   var idx = LIB.experiences.findIndex(function(x) { return x.id === e.id; });
-  if (idx >= 0) LIB.experiences[idx] = e;
-  else LIB.experiences.push(e);
+  if (idx >= 0) { LIB.experiences[idx] = e; }
+  else { LIB.experiences.push(e); }
+
+  // Save achievements: role profile override or master
+  if (activeRole) {
+    ensureRoleProfiles();
+    if (!LIB.roleProfiles[activeRole]) LIB.roleProfiles[activeRole] = {};
+    LIB.roleProfiles[activeRole][e.id] = achs;
+    // Keep master achievements unchanged
+  } else {
+    e.content.achievements = achs;
+    delete e.content.points;
+  }
 
   var savedId = e.id;
   editingEntry = null;
+  markDirty();
   render();
+  writeToDisk();
   // Flash the saved card
   var card = document.getElementById('card-' + savedId);
   if (card) { card.classList.add('flash'); setTimeout(function() { card.classList.remove('flash'); }, 1500); }
@@ -479,7 +792,9 @@ function executeDelete() {
     if (e && e.content.achievements) e.content.achievements.splice(deleteConfirm.achIdx, 1);
   }
   deleteConfirm = null;
+  markDirty();
   render();
+  writeToDisk();
 }
 function renderDeleteConfirm() {
   var ov = document.createElement('div');
@@ -518,7 +833,9 @@ function deleteSkill(dimName, idx) {
   var d = LIB.skillDimensions.find(function(x) { return x.name === dimName; });
   if (!d) return;
   d.items.splice(idx, 1);
+  markDirty();
   render();
+  writeToDisk();
 }
 function closeSkillEditor() { editingDim = null; editingSkill = null; removeOverlays(); render(); }
 
@@ -541,7 +858,7 @@ function renderSkillEditor() {
     h += '<div class="form-group"><label>所属能力大类</label><input disabled value="' + esc(editingSkill.dimName) + '"></div>';
     h += '<div class="form-group"><label>技能名称</label><input id="sk-name" value="' + esc(editingSkill.skill.name||'') + '" placeholder="如 SQL"></div>';
     h += '<div class="form-group"><label>熟练度</label><select id="sk-prof">' +
-      ['了解','熟悉','熟练','精通'].map(function(p) { return '<option value="' + p + '"' + (editingSkill.skill.proficiency===p?' selected':'') + '>' + p + '</option>'; }).join('') +
+      ['了解','熟悉','熟练'].map(function(p) { return '<option value="' + p + '"' + (editingSkill.skill.proficiency===p?' selected':'') + '>' + p + '</option>'; }).join('') +
       '</select></div>';
     h += '<div class="form-group"><label>描述</label><textarea id="sk-desc" placeholder="应用场景或能力说明">' + esc(editingSkill.skill.description||'') + '</textarea></div>';
     h += '<div class="form-actions">' +
@@ -567,7 +884,9 @@ function saveDim() {
     LIB.skillDimensions.push({ name: name, items: [] });
   }
   editingDim = null;
+  markDirty();
   render();
+  writeToDisk();
 }
 function saveSkill() {
   ensureSkillDimensions();
@@ -586,12 +905,15 @@ function saveSkill() {
     dim.items.push(s);
   }
   editingSkill = null;
+  markDirty();
   render();
+  writeToDisk();
 }
 
 // ═══ Init ═══
 render();
 
 </script>
-</body>
-</html>
+
+
+</body></html>

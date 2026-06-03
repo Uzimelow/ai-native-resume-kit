@@ -1,21 +1,29 @@
 # Material Library（素材库）
 
-浏览器打开 `library.html` — 既是数据存储，也是可视化编辑器。
+浏览器打开 `library.html` 进入编辑器，选择 `library-data.json` 加载数据。数据与 UI 分离。
 
 ## 文件结构
 
 ```
 material-library/
-└── library.html     # 唯一的文件 — 数据 + 编辑器
+├── library.html          # 编辑器 UI（纯壳，无内嵌数据）
+└── library-data.json     # 结构化素材数据（JSON）
 ```
+
+## 首次使用
+
+1. 浏览器打开 `library.html`
+2. 页面显示引导：点击「选择 library-data.json」
+3. 选中 `library-data.json` → 进入编辑器
+4. 之后所有编辑自动保存，再次打开时自动恢复
 
 ## 编辑器
 
 两个 Tab：
-- **素材条目** — 全部 / 实习 / 项目 筛选，点击卡片可直接编辑 achievements
-- **技能画像** — 按能力大类分组，每条子技能带名称、熟练度、描述
+- **素材条目** — 全部 / 实习 / 项目 筛选 + 岗位画像切换
+- **技能画像** — 按能力大类分组，可折叠，子技能上下排列
 
-编辑后通过 File System Access API 直接保存（或下载替换）。
+编辑通过 File System Access API 直接写入 JSON 文件。不支持 FSA 的浏览器可下载文件手动替换。
 
 ## 数据模型
 

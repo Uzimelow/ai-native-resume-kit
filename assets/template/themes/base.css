@@ -290,17 +290,9 @@ button:disabled:hover {
 }
 
 .achievement-list li,
-.project-points li,
 .skill-points li {
 	text-align: justify;
 	text-justify: inter-ideograph;
-}
-
-.project-points {
-	margin: 1.2mm 0 0;
-	display: grid;
-	gap: 0.9mm;
-	padding-left: 3.8mm;
 }
 
 /* ---- Responsive ---- */
@@ -370,10 +362,12 @@ button:disabled:hover {
 	}
 
 	/* kill pseudo-elements entirely — display:none is not enough to prevent Chrome rasterization */
-	.resume-page::before,
-	.section-title::before {
+		.resume-page::before,
+		.section-title::before {
 		content: none;
+		}
 	}
+
 
 	.portrait {
 		box-shadow: none;

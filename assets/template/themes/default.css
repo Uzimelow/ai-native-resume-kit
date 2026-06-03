@@ -264,15 +264,6 @@ body {
 	color: var(--navy);
 }
 
-.project-points {
-	font-size: 9pt;
-	line-height: 1.48;
-}
-
-.project-points strong {
-	color: var(--navy);
-}
-
 /* ---- Skills ---- */
 .skill-label {
 	margin: 0;
