@@ -2,7 +2,7 @@
 
 > 把 PDF / DOCX 简历转换成 AI 可编辑、可预览、可导出 A4 PDF 的 HTML 简历，并支持根据 JD 定制、评估匹配度、润色优化、生成打招呼话术。
 
-在线 Demo：[简历模板](https://uzimelow.github.io/ai-native-resume-kit/assets/template/index.html) · [评估报告](https://uzimelow.github.io/ai-native-resume-kit/assets/template/report-template.html) · [招呼话术](https://uzimelow.github.io/ai-native-resume-kit/assets/template/self-intro-template.html)
+在线 Demo：[简历模板](https://uzimelow.github.io/ai-native-resume-kit/assets/template/index.html) · [素材库](https://uzimelow.github.io/ai-native-resume-kit/assets/template/library-demo.html) · [评估报告](https://uzimelow.github.io/ai-native-resume-kit/assets/template/report-template.html) · [招呼话术](https://uzimelow.github.io/ai-native-resume-kit/assets/template/self-intro-template.html)
 
 ---
 
@@ -33,7 +33,7 @@
 | 想手动查看/编辑素材库 | 浏览器打开 `material-library/library.html`，选择 `library-data.json` 加载数据 |
 | 已有 HTML 简历，只想改改 | > 「帮我润色这段实习经历」 |
 | 已有 HTML 简历 + 新 JD | > 「根据这个 JD 定制一版简历」 |
-| 只想看看模板长什么样 | 直接打开 [简历 Demo](https://uzimelow.github.io/ai-native-resume-kit/assets/template/index.html) · [报告 Demo](https://uzimelow.github.io/ai-native-resume-kit/assets/template/report-template.html) |
+| 只想看看模板长什么样 | 打开 [简历](https://uzimelow.github.io/ai-native-resume-kit/assets/template/index.html) · [素材库](https://uzimelow.github.io/ai-native-resume-kit/assets/template/library-demo.html) · [报告](https://uzimelow.github.io/ai-native-resume-kit/assets/template/report-template.html) · [招呼](https://uzimelow.github.io/ai-native-resume-kit/assets/template/self-intro-template.html) |
 
 AI 会自动读取文件、识别意图、走对应的处理流程。全过程由 AI 完成——你只需上传文件和确认改动。
 
