@@ -347,19 +347,28 @@ function setupDragDrop() {
     if (!LIB) {
       e.preventDefault(); e.stopPropagation();
       dragCounter = 0; document.body.classList.remove('drag-over');
-      var file = e.dataTransfer.files[0];
+      var file = (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) || null;
       if (!file) return;
       if (!/\.json$/i.test(file.name) && file.type !== 'application/json') { alert('请拖入 library-data.json 文件'); return; }
-      var reader = new FileReader();
-      reader.onload = function(ev) {
-        try {
-          LIB = JSON.parse(ev.target.result);
-          if (!LIB || typeof LIB !== 'object' || !LIB.experiences || !LIB.skillDimensions) throw new Error('数据格式不正确：缺少 experiences 或 skillDimensions 字段');
-          fileHandle = null; dirty = false;
+      // Try to get writable FileSystemFileHandle from drag event (Chrome/Edge)
+      var handlePromise = Promise.resolve(null);
+      if (e.dataTransfer.items && e.dataTransfer.items[0] && typeof e.dataTransfer.items[0].getAsFileSystemHandle === 'function') {
+        handlePromise = e.dataTransfer.items[0].getAsFileSystemHandle().then(function(h) {
+          return (h && h.kind === 'file') ? h : null;
+        }).catch(function() { return null; });
+      }
+      handlePromise.then(function(h) {
+        file.text().then(function(t) {
+          var data = JSON.parse(t);
+          if (!data.experiences || !data.skillDimensions) throw new Error('数据格式不正确：缺少 experiences 或 skillDimensions 字段');
+          LIB = data; dirty = false;
+          if (h) { fileHandle = h; idbSaveHandle(h).catch(function(){}); }
+          else { fileHandle = null; }
           render();
-        } catch(err) { console.error('Drop load failed:', err); LIB = null; alert('无法加载文件：' + err.message); render(); }
-      };
-      reader.readAsText(file);
+        }).catch(function(err) {
+          console.error('Drop load failed:', err); LIB = null; alert('无法加载文件：' + err.message); render();
+        });
+      });
     }
   });
 }
