@@ -269,7 +269,7 @@ Filter `library.skillDimensions` to skills with evidence in selected experiences
 
 **6. Assemble resume-data.js:**
 - `basics` + `education` from `library.profile`
-- `internships` / `projects` from user-selected entries
+- `internships` / `projects` from user-selected entries. **Data source:** If Step 0 selected a role profile, read achievements from `roleProfiles[roleName][entryId]`; fall back to `entry.content.achievements` (master) when no override exists. Use `getEffectiveAchievements()` logic — master and roleProfiles are two independent data sources, always resolve through the same path.
 - `skills` from `library.skillDimensions`, flattened to `skills[{label, text}]` format
 
 **7. Tailor — rewrite principles:**
@@ -350,7 +350,7 @@ Manage the persistent material library. Read `material-library/library-data.json
 | "查看素材库" / "素材库有什么" / "library list" | List all entries compactly: ID, source name, type, top 3 capability tags, usage count, evidence strength. Use a table. |
 | "查看 exp-XXX" | Show full detail of one entry: all fields, all tags, usage history, notes. |
 | "添加经历" / "add to library" | Guided interactive: ask for company/role/period/achievements → auto-tag using role-competency-library.md → preview tags for user confirmation → append to library. |
-| "删除 exp-XXX" / "remove" | Confirm with user, then remove entry by ID from `experiences[]`. |
+| "删除 exp-XXX" / "remove" | Confirm with user, then remove entry by ID from `experiences[]`. Also remove orphaned overrides: iterate all `roleProfiles` keys and `delete roleProfiles[role][exp-XXX]`. |
 | "素材库统计" / "library stats" | Show: total entries, entries per type, skill dimensions count, last modified date. |
 | "新建岗位画像" / "create role profile" | Create a new role profile (e.g., "AI产品经理", "B端运营"). Experiences initialize from master. |
 | "切换到 XX 岗位" / "switch role" | Switch active role profile. Subsequent edits save to that role's achievement overrides. |

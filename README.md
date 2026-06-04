@@ -24,6 +24,10 @@
 
 本工具配合 AI 编程助手使用（Claude Code、Codex、Trae 等均可）。
 
+在 AI 编程助手中输入：
+
+> 帮我安装这个 skill：https://github.com/Uzimelow/ai-native-resume-kit
+
 ### 选一条适合你的路径
 
 | 你的情况 | 对 AI 说 |
